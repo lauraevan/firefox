@@ -16,6 +16,7 @@ ChromeUtils.defineESModuleGetters(lazy, {
   ASRouterNewTabHook: "resource:///modules/asrouter/ASRouterNewTabHook.sys.mjs",
   AddonManager: "resource://gre/modules/AddonManager.sys.mjs",
   BackupService: "resource:///modules/backup/BackupService.sys.mjs",
+  BuiltInThemes: "resource:///modules/BuiltInThemes.sys.mjs",
   BrowserSearchTelemetry:
     "moz-src:///browser/components/search/BrowserSearchTelemetry.sys.mjs",
   BrowserUtils: "resource://gre/modules/BrowserUtils.sys.mjs",
@@ -400,6 +401,10 @@ BrowserGlue.prototype = {
 
     // apply distribution customizations
     lazy.DistributionManagement.applyCustomizations();
+
+    // Ensure the active built-in theme (e.g. the default GX theme) is
+    // installed before the first window paints.
+    lazy.BuiltInThemes.maybeInstallActiveBuiltInTheme();
 
     // handle any UI migration
     this._migrateUI();

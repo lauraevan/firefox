@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* GX skin layer: accent-driven effects layered on top of the GX built-in
+ * themes. Every rule is gated on browser.gx.skin.enabled so the stock UI is
+ * untouched when the pref is off, and scoped to themed windows (lwtheme) so
+ * stock themes keep their standard look. The accent follows the active
+ * theme's tab line color, falling back to the default GX accent. */
+
+@media -moz-pref("browser.gx.skin.enabled") {
+  :root[lwtheme] {
+    --gx-accent: var(--lwt-tab-line-color, #ff2e63);
+    --gx-glow: color-mix(in srgb, var(--gx-accent) 45%, transparent);
+    --gx-glow-strong: color-mix(in srgb, var(--gx-accent) 70%, transparent);
+    --focus-outline-color: var(--gx-accent);
+  }
+
+  :root[lwtheme] .tab-background:is([selected], [multiselected]) {
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 0 8px var(--gx-glow);
+  }
+
+  :root[lwtheme] .tabbrowser-tab[busy] .tab-background {
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 0 10px var(--gx-glow-strong);
+  }
+
+  :root[lwtheme] #urlbar[focused] .urlbar-background {
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 0 10px var(--gx-glow);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tab-background {
+      transition:
+        background-color 150ms ease,
+        box-shadow 250ms ease;
+    }
+
+    .toolbarbutton-1 {
+      transition: background-color 150ms ease;
+    }
+
+    .urlbar-background {
+      transition: box-shadow 250ms ease;
+    }
+  }
+}

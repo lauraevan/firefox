@@ -132,10 +132,10 @@ Ship as another built-in theme + a pref-gated section of the skin CSS:
   translucency-over-wallpaper is the portable v1.
 
 **Deliverables for Phase 1**
-- [ ] `browser/themes/addons/gx-dark/` (+ variants), registered
+- [x] `browser/themes/addons/gx/` built-in theme, registered (variants pending)
 - [ ] `browser/components/gxtheme/` dynamic theme engine (wallpaper + accent)
-- [ ] `browser/themes/shared/gx-skin.css` with pref-gated effects
-- [ ] `browser.gx.*` prefs in `firefox.js`
+- [x] `browser/themes/shared/gx-skin.css` with pref-gated effects
+- [x] `browser.gx.*` prefs in `firefox.js` (GX theme is the default)
 - [ ] Liquid Glass theme variant + CSS; macOS vibrancy as stretch goal
 
 ---

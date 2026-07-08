@@ -46,4 +46,11 @@ export const BuiltInThemeConfig = new Map([
       path: "resource://builtin-themes/alpenglow/",
     },
   ],
+  [
+    "firefox-gx@mozilla.org",
+    {
+      version: "1.0.0",
+      path: "resource://builtin-themes/gx/",
+    },
+  ],
 ]);

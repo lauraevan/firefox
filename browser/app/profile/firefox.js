@@ -990,6 +990,11 @@ pref("browser.theme.dark-private-windows", true);
 // system theme and forced-colors palette to style the chrome.
 pref("browser.theme.forced-colors-override.enabled", true);
 
+// GX appearance: default to the built-in GX theme and enable the
+// accent-effects skin layer (see browser/themes/shared/gx-skin.css).
+pref("extensions.activeThemeID", "firefox-gx@mozilla.org");
+pref("browser.gx.skin.enabled", true);
+
 // Pref to control whether or not Private Browsing windows show up
 // as separate icons in the Windows taskbar.
 pref("browser.privateWindowSeparation.enabled", true);
