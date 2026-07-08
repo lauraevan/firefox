@@ -11,12 +11,14 @@
  */
 
 const PREF_WALLPAPER = "browser.aurora.wallpaper";
+const PREF_ACCENT = "browser.aurora.accent";
 
 const BUNDLED_WALLPAPERS = new Map([
   ["aurora", "resource://builtin-themes/aurora/background-aurora.svg"],
   ["glass", "resource://builtin-themes/aurora-glass/background-glass.svg"],
   ["dusk", "chrome://browser/content/aurora/wallpapers/dusk.svg"],
   ["midnight", "chrome://browser/content/aurora/wallpapers/midnight.svg"],
+  ["aurora-flow", "chrome://browser/content/aurora/wallpapers/aurora-flow.svg"],
 ]);
 
 const THEME_VARIABLES = [
@@ -25,6 +27,8 @@ const THEME_VARIABLES = [
   "--lwt-background-tiling",
   "--lwt-background-size",
 ];
+
+const ACCENT_VARIABLES = ["--aurora-accent", "--lwt-tab-line-color"];
 
 export const AuroraThemeManager = {
   _initialized: false,
@@ -35,6 +39,7 @@ export const AuroraThemeManager = {
     }
     this._initialized = true;
     Services.prefs.addObserver(PREF_WALLPAPER, this);
+    Services.prefs.addObserver(PREF_ACCENT, this);
     Services.obs.addObserver(this, "browser-delayed-startup-finished");
     Services.obs.addObserver(this, "lightweight-theme-styling-update");
   },
@@ -53,6 +58,16 @@ export const AuroraThemeManager = {
         Services.tm.dispatchToMainThread(() => this.applyAll());
         break;
     }
+  },
+
+  resolveAccent() {
+    let value = Services.prefs.getStringPref(PREF_ACCENT, "");
+    // Accept only simple color syntax; anything else falls back to the
+    // theme's own accent.
+    if (/^(#[0-9a-fA-F]{3,8}|[a-zA-Z]+)$/.test(value)) {
+      return value;
+    }
+    return null;
   },
 
   resolveWallpaperURL() {
@@ -91,6 +106,17 @@ export const AuroraThemeManager = {
       root.style.setProperty("--lwt-background-size", "cover");
     } else {
       for (let variable of THEME_VARIABLES) {
+        root.style.removeProperty(variable);
+      }
+    }
+
+    let accent = this.resolveAccent();
+    if (accent) {
+      for (let variable of ACCENT_VARIABLES) {
+        root.style.setProperty(variable, accent);
+      }
+    } else {
+      for (let variable of ACCENT_VARIABLES) {
         root.style.removeProperty(variable);
       }
     }

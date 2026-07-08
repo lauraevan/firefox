@@ -26,6 +26,7 @@ Preferences.addAll([
   { id: "browser.aurora.skin.enabled", type: "bool" },
   { id: "browser.aurora.liquidGlass.enabled", type: "bool" },
   { id: "browser.aurora.wallpaper", type: "string" },
+  { id: "browser.aurora.accent", type: "string" },
 ]);
 
 // Turning Liquid Glass on switches to the frosted built-in theme along with
@@ -52,6 +53,16 @@ Preferences.addSetting({
   },
 });
 
+// Accent color for the tab line, glows, and focus rings. An empty pref
+// means the active theme's own accent.
+Preferences.addSetting({
+  id: "aurora-accent",
+  pref: "browser.aurora.accent",
+  get(val) {
+    return val || "#8a9bff";
+  },
+});
+
 SettingGroupManager.registerGroups({
   aurora: {
     l10nId: "aurora-appearance-group",
@@ -67,6 +78,11 @@ SettingGroupManager.registerGroups({
         id: "aurora-effects",
         l10nId: "aurora-effects-toggle",
         control: "moz-toggle",
+      },
+      {
+        id: "aurora-accent",
+        l10nId: "aurora-accent-picker",
+        control: "moz-input-color",
       },
       {
         id: "aurora-wallpaper",
@@ -115,6 +131,15 @@ SettingGroupManager.registerGroups({
               class: "setting-chooser-item",
               imagesrc:
                 "chrome://browser/content/aurora/wallpapers/midnight.svg",
+            },
+          },
+          {
+            value: "aurora-flow",
+            l10nId: "aurora-wallpaper-choice-flow",
+            controlAttrs: {
+              class: "setting-chooser-item",
+              imagesrc:
+                "chrome://browser/content/aurora/wallpapers/aurora-flow.svg",
             },
           },
         ],

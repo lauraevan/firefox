@@ -997,6 +997,7 @@ pref("extensions.activeThemeID", "firefox-aurora@mozilla.org");
 pref("browser.aurora.skin.enabled", true);
 pref("browser.aurora.liquidGlass.enabled", false);
 pref("browser.aurora.wallpaper", "default");
+pref("browser.aurora.accent", "");
 
 // Pref to control whether or not Private Browsing windows show up
 // as separate icons in the Windows taskbar.

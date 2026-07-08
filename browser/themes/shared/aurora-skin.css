@@ -43,6 +43,18 @@
     padding-inline: var(--space-small);
   }
 
+  /* Bookmarks bar: pill-shaped items with roomier spacing. */
+  :root[lwtheme] #PersonalToolbar {
+    padding-inline: var(--space-small);
+    padding-block: var(--space-xxsmall);
+  }
+
+  :root[lwtheme] #PersonalToolbar .bookmark-item {
+    border-radius: var(--border-radius-small);
+    padding-inline: var(--space-small);
+    padding-block: var(--space-xxsmall);
+  }
+
   :root[lwtheme] .urlbar-background,
   :root[lwtheme] #urlbar-background {
     /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
@@ -56,7 +68,8 @@
         box-shadow 250ms ease;
     }
 
-    .toolbarbutton-1 {
+    .toolbarbutton-1,
+    #PersonalToolbar .bookmark-item {
       transition: background-color 150ms ease;
     }
 

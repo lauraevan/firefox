@@ -2745,3 +2745,9 @@ aurora-wallpaper-choice-dusk =
     .label = Dusk
 aurora-wallpaper-choice-midnight =
     .label = Midnight
+
+aurora-accent-picker =
+    .label = Accent color
+    .description = Colors the active tab line, glows, and focus rings.
+aurora-wallpaper-choice-flow =
+    .label = Aurora Flow (animated)
