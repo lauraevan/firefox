@@ -2716,3 +2716,32 @@ security-privacy-issue-warning-ech =
 security-privacy-issue-warning-proxy-autodetection =
   .label = Proxy auto-configuration is enabled
   .description = Proxy auto-configuration could let untrusted networks to monitor your activity.
+
+## Aurora appearance settings
+
+aurora-appearance-group =
+    .label = Aurora
+    .description = Wallpapers, Liquid Glass, and motion. Make { -brand-short-name } yours.
+
+aurora-liquid-glass-toggle =
+    .label = Liquid Glass
+    .description = A frosted, translucent look across toolbars, tabs, and the address bar.
+
+aurora-effects-toggle =
+    .label = Accent effects and animations
+    .description = Soft accent glow and smooth motion in the toolbar and tabs.
+
+aurora-wallpaper-picker =
+    .label = Wallpaper
+    .description = Choose the backdrop behind your tabs and toolbar.
+
+aurora-wallpaper-choice-default =
+    .label = Theme default
+aurora-wallpaper-choice-aurora =
+    .label = Aurora
+aurora-wallpaper-choice-glass =
+    .label = Iridescent
+aurora-wallpaper-choice-dusk =
+    .label = Dusk
+aurora-wallpaper-choice-midnight =
+    .label = Midnight

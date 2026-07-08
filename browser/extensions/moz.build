@@ -11,4 +11,7 @@ DIRS += [
     "newtab",
 ]
 
+if CONFIG["MOZ_UBLOCK_XPI"]:
+    DIRS += ["ublock"]
+
 JAR_MANIFESTS += ["jar.mn"]

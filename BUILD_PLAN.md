@@ -139,7 +139,7 @@ Ship as another built-in theme + a pref-gated section of the skin CSS:
 
 **Deliverables for Phase 1**
 - [x] `browser/themes/addons/aurora/` built-in theme, registered
-- [ ] `browser/components/auroratheme/` dynamic theme engine (wallpaper + accent)
+- [x] `browser/components/aurora/AuroraThemeManager.sys.mjs` wallpaper engine (accent picker pending)
 - [x] `browser/themes/shared/aurora-skin.css` with pref-gated effects
 - [x] `browser.aurora.*` prefs in `firefox.js` (Aurora theme is the default)
 - [x] Liquid Glass theme variant + CSS (settings-toggled); macOS vibrancy as stretch goal
@@ -185,9 +185,9 @@ same moz-* widgets) is possible but only worth it if the design outgrows
 preferences. Start inside about:preferences.
 
 **Deliverables for Phase 2**
-- [ ] `config/auroraTheme.mjs` pane + registration
-- [ ] Fluent strings
-- [ ] Wallpaper picker component with live apply
+- [x] `config/aurora.mjs` group in the appearance pane
+- [x] Fluent strings
+- [x] Wallpaper picker (bundled wallpapers) with live apply; custom file picker pending
 - [ ] Smooth transitions: CSS view transitions / animations within the pane
 
 ---
@@ -244,7 +244,7 @@ remain separate works — but keep uBO's license text with it, don't strip
 attribution, and if you patch uBO itself, publish those patches.
 
 **Deliverables for Phase 3**
-- [ ] Package AMO-signed xpi into `distribution/extensions/`
+- [x] Packaging wired (`browser/extensions/ublock/`); run `vendor.py` once to fetch the AMO xpi (network-restricted here)
 - [ ] First-run check that it's active; expose an "Ad blocking" row in your
       settings pane linking to uBO's dashboard
 - [ ] (Later, optional) migrate to in-tree built-in add-on
@@ -278,3 +278,15 @@ attribution, and if you patch uBO itself, publish those patches.
 5. uBO via distribution/extensions
 6. Liquid Glass CSS mode; macOS vibrancy stretch goal
 7. Branding, packaging, upstream-merge dry run
+
+---
+
+## Deferred: Scramjet proxy
+
+Requested as an optional privacy feature. Deliberately deferred: Scramjet is
+an interstitial web proxy that requires a hosted server component (it cannot
+ship inside the browser), and its primary use case is circumventing network
+filtering rather than blocking ad tracking - uBlock Origin plus Firefox's
+built-in Enhanced Tracking Protection already cover the tracking goal. If
+still wanted later, the right shape is an optional extension or proxy setting
+pointing at a self-hosted Scramjet instance, off by default.

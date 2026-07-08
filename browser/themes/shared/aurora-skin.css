@@ -31,6 +31,24 @@
     box-shadow: 0 0 10px var(--aurora-glow);
   }
 
+  /* Cozy layout: soft radii and breathing room, keeping Firefox's
+   * structure while echoing Safari's floating, rounded surfaces. */
+  :root[lwtheme] {
+    --tab-border-radius: 10px;
+    --urlbar-background-border-radius: 12px;
+    --toolbarbutton-border-radius: 8px;
+  }
+
+  :root[lwtheme] #nav-bar {
+    padding-inline: var(--space-small);
+  }
+
+  :root[lwtheme] .urlbar-background,
+  :root[lwtheme] #urlbar-background {
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .tab-background {
       transition:

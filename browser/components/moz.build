@@ -31,6 +31,7 @@ DIRS += [
     "aiwindow",
     "asrouter",
     "attribution",
+    "aurora",
     "backup",
     "contentanalysis",
     "contentsharing",

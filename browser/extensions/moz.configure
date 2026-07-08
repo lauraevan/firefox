@@ -1,1 +1,23 @@
 set_config("MOZ_JAR_MAKER_FILE_FORMAT", "jar")
+
+
+# Ship uBlock Origin when its AMO-signed xpi has been vendored into the
+# tree (see browser/extensions/ublock/README.md). The build works either
+# way; run browser/extensions/ublock/vendor.py to fetch the xpi.
+@depends(build_environment)
+@imports(_from="os.path", _import="exists")
+@imports(_from="os.path", _import="join")
+def ublock_xpi(build_env):
+    xpi = join(
+        build_env.topsrcdir,
+        "browser",
+        "extensions",
+        "ublock",
+        "uBlock0@raymondhill.net.xpi",
+    )
+    if exists(xpi):
+        return True
+    return None
+
+
+set_config("MOZ_UBLOCK_XPI", ublock_xpi)

@@ -4,6 +4,7 @@
 
 import { Preferences } from "chrome://global/content/preferences/Preferences.mjs";
 import { SettingGroupManager } from "chrome://browser/content/preferences/config/SettingGroupManager.mjs";
+import "chrome://browser/content/preferences/config/aurora.mjs";
 
 const { AppConstants } = ChromeUtils.importESModule(
   "resource://gre/modules/AppConstants.sys.mjs"

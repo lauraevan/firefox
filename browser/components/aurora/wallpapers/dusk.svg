@@ -1,0 +1,21 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="400" viewBox="0 0 2400 400">
+  <defs>
+    <filter id="dusk-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="70"/>
+    </filter>
+    <linearGradient id="dusk-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1423"/>
+      <stop offset="1" stop-color="#2b1d33"/>
+    </linearGradient>
+  </defs>
+  <rect width="2400" height="400" fill="url(#dusk-sky)"/>
+  <g filter="url(#dusk-soft)">
+    <ellipse cx="1800" cy="360" rx="900" ry="260" fill="#f4a26b" opacity="0.4"/>
+    <ellipse cx="1500" cy="420" rx="700" ry="220" fill="#e86f6f" opacity="0.35"/>
+    <ellipse cx="400" cy="80" rx="500" ry="180" fill="#8a6bb8" opacity="0.35"/>
+    <ellipse cx="2200" cy="60" rx="400" ry="160" fill="#c78ad6" opacity="0.25"/>
+  </g>
+</svg>
