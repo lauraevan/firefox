@@ -39,8 +39,17 @@
     --toolbarbutton-border-radius: 8px;
   }
 
+  /* Floating island navigation bar: the address bar row detaches from
+   * the window edges and floats over the wallpaper. The tab strip and
+   * the in-page layout (including the new tab page's centered search)
+   * are untouched. */
   :root[lwtheme] #nav-bar {
+    margin-inline: var(--space-medium);
+    margin-block-end: var(--space-small);
+    border-radius: var(--border-radius-medium);
     padding-inline: var(--space-small);
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 6px 18px rgba(6, 10, 24, 0.25);
   }
 
   /* Bookmarks bar: pill-shaped items with roomier spacing. */

@@ -1,0 +1,55 @@
+name: Aurora Browser build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/firefox-theming-ublock-wkx8wi
+
+concurrency:
+  group: aurora-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /opt/hostedtoolcache/CodeQL || true
+          df -h /
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 300
+
+      - name: Write mozconfig (artifact build)
+        run: |
+          cat > mozconfig <<'EOF'
+          ac_add_options --enable-artifact-builds
+          mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/objdir-aurora
+          EOF
+
+      - name: Bootstrap build environment
+        run: ./mach --no-interactive bootstrap --application-choice browser_artifact_mode
+
+      - name: Vendor uBlock Origin
+        run: python3 browser/extensions/ublock/vendor.py
+
+      - name: Build
+        run: ./mach build
+
+      - name: Package
+        run: ./mach package
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-browser-linux64
+          path: |
+            objdir-aurora/dist/*.tar.xz
+            objdir-aurora/dist/*.tar.bz2
+          if-no-files-found: error
+          retention-days: 14
