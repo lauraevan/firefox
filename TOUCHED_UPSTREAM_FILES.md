@@ -5,14 +5,14 @@ we ship lives in new directories (see BUILD_PLAN.md).
 
 | File | Change |
 | --- | --- |
-| `browser/app/profile/firefox.js` | Added `extensions.activeThemeID` default (GX theme) and `browser.gx.skin.enabled` pref |
+| `browser/app/profile/firefox.js` | Added `extensions.activeThemeID` default (Aurora theme) and `browser.aurora.*` prefs |
 | `browser/components/BrowserGlue.sys.mjs` | Lazy getter + `BuiltInThemes.maybeInstallActiveBuiltInTheme()` call in `_beforeUIStartup` |
-| `browser/themes/BuiltInThemeConfig.sys.mjs` | Registered `firefox-gx@mozilla.org` entry |
-| `browser/themes/addons/jar.mn` | Packaged `gx/` theme files |
-| `browser/themes/shared/browser-shared.css` | One `@import` for `gx-skin.css` |
-| `browser/themes/shared/jar.inc.mn` | Packaged `gx-skin.css` |
+| `browser/themes/BuiltInThemeConfig.sys.mjs` | Registered `firefox-aurora@mozilla.org` and `firefox-aurora-glass@mozilla.org` entries |
+| `browser/themes/addons/jar.mn` | Packaged `aurora/` and `aurora-glass/` theme files |
+| `browser/themes/shared/browser-shared.css` | One `@import` for `aurora-skin.css` |
+| `browser/themes/shared/jar.inc.mn` | Packaged `aurora-skin.css` |
 
 New directories/files (no merge cost):
 
-- `browser/themes/addons/gx/` (built-in GX theme)
-- `browser/themes/shared/gx-skin.css` (pref-gated effects layer)
+- `browser/themes/addons/aurora/` and `browser/themes/addons/aurora-glass/` (built-in themes)
+- `browser/themes/shared/aurora-skin.css` (pref-gated effects and Liquid Glass layer)

@@ -1,0 +1,31 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="400" viewBox="0 0 2400 400">
+  <defs>
+    <filter id="aurora-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+    <linearGradient id="aurora-ribbon-a" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#52d8c6" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#52d8c6" stop-opacity="0.5"/>
+      <stop offset="0.7" stop-color="#8a9bff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#8a9bff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="aurora-ribbon-b" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a9bff" stop-opacity="0"/>
+      <stop offset="0.4" stop-color="#a58aff" stop-opacity="0.4"/>
+      <stop offset="0.75" stop-color="#52d8c6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#52d8c6" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="2400" height="400" fill="#10121a"/>
+  <g filter="url(#aurora-soft)">
+    <path d="M -100 240 C 500 60 900 320 1500 140 C 1900 20 2200 180 2500 80 L 2500 -80 L -100 -80 Z"
+          fill="url(#aurora-ribbon-a)" opacity="0.8"/>
+    <path d="M -100 380 C 600 220 1100 420 1700 260 C 2100 160 2300 300 2500 220 L 2500 480 L -100 480 Z"
+          fill="url(#aurora-ribbon-b)" opacity="0.55"/>
+    <ellipse cx="1900" cy="40" rx="360" ry="140" fill="#8a9bff" opacity="0.22"/>
+    <ellipse cx="500" cy="60" rx="320" ry="120" fill="#52d8c6" opacity="0.16"/>
+  </g>
+</svg>

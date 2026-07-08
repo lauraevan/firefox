@@ -8,8 +8,11 @@ browser.jar:
   content/builtin-themes/alpenglow                 (alpenglow/*.svg)
   content/builtin-themes/alpenglow/manifest.json   (alpenglow/manifest.json)
 
-  content/builtin-themes/gx                        (gx/*.svg)
-  content/builtin-themes/gx/manifest.json          (gx/manifest.json)
+  content/builtin-themes/aurora                       (aurora/*.svg)
+  content/builtin-themes/aurora/manifest.json         (aurora/manifest.json)
+
+  content/builtin-themes/aurora-glass                 (aurora-glass/*.svg)
+  content/builtin-themes/aurora-glass/manifest.json   (aurora-glass/manifest.json)
 
   content/builtin-themes/dark/preview.svg          (dark/preview.svg)
   content/builtin-themes/dark/icon.svg             (dark/icon.svg)

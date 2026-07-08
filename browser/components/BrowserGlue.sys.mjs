@@ -402,7 +402,7 @@ BrowserGlue.prototype = {
     // apply distribution customizations
     lazy.DistributionManagement.applyCustomizations();
 
-    // Ensure the active built-in theme (e.g. the default GX theme) is
+    // Ensure the active built-in theme (e.g. the default Aurora theme) is
     // installed before the first window paints.
     lazy.BuiltInThemes.maybeInstallActiveBuiltInTheme();
 

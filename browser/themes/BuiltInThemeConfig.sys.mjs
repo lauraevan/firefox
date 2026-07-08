@@ -47,10 +47,17 @@ export const BuiltInThemeConfig = new Map([
     },
   ],
   [
-    "firefox-gx@mozilla.org",
+    "firefox-aurora@mozilla.org",
     {
       version: "1.0.0",
-      path: "resource://builtin-themes/gx/",
+      path: "resource://builtin-themes/aurora/",
+    },
+  ],
+  [
+    "firefox-aurora-glass@mozilla.org",
+    {
+      version: "1.0.0",
+      path: "resource://builtin-themes/aurora-glass/",
     },
   ],
 ]);

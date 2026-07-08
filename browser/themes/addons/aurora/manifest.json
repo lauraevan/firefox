@@ -1,0 +1,66 @@
+{
+  "manifest_version": 2,
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "firefox-aurora@mozilla.org"
+    }
+  },
+
+  "name": "Aurora",
+  "description": "A premium dark appearance with a soft aurora wallpaper.",
+  "author": "Mozilla",
+  "version": "1.0.0",
+
+  "icons": { "32": "icon.svg" },
+
+  "theme": {
+    "images": {
+      "additional_backgrounds": ["background-aurora.svg"]
+    },
+
+    "properties": {
+      "additional_backgrounds_alignment": ["center top"],
+      "additional_backgrounds_tiling": ["no-repeat"],
+      "additional_backgrounds_size": ["cover"],
+      "color_scheme": "dark"
+    },
+
+    "colors": {
+      "frame": "#10121a",
+      "frame_inactive": "#0e1017",
+      "toolbar": "rgba(25, 28, 38, 0.88)",
+      "toolbar_text": "#e4e7ef",
+      "toolbar_field": "#20242f",
+      "toolbar_field_text": "#e4e7ef",
+      "toolbar_field_focus": "#262b38",
+      "toolbar_field_text_focus": "#ffffff",
+      "toolbar_field_border": "transparent",
+      "toolbar_field_border_focus": "#8a9bff",
+      "toolbar_field_highlight": "rgba(138, 155, 255, 0.3)",
+      "toolbar_top_separator": "transparent",
+      "toolbar_bottom_separator": "rgba(6, 8, 12, 0.6)",
+      "tab_text": "#ffffff",
+      "tab_background_text": "#9aa2b5",
+      "tab_line": "#8a9bff",
+      "tab_loading": "#52d8c6",
+      "bookmark_text": "#e4e7ef",
+      "icons": "#a9b1c7",
+      "icons_attention": "#8a9bff",
+      "button_background_hover": "rgba(255, 255, 255, 0.07)",
+      "button_background_active": "rgba(255, 255, 255, 0.12)",
+      "popup": "#1d212c",
+      "popup_text": "#e4e7ef",
+      "popup_border": "#2b3040",
+      "popup_highlight": "rgba(138, 155, 255, 0.2)",
+      "popup_highlight_text": "#ffffff",
+      "sidebar": "#151823",
+      "sidebar_text": "#e4e7ef",
+      "sidebar_border": "#232838",
+      "sidebar_highlight": "rgba(138, 155, 255, 0.2)",
+      "sidebar_highlight_text": "#ffffff",
+      "ntp_background": "#12141d",
+      "ntp_text": "#e4e7ef"
+    }
+  }
+}

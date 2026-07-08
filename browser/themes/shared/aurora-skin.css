@@ -1,0 +1,87 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* Aurora skin layer: accent-driven polish layered on top of the built-in
+ * Aurora themes. Every rule is gated on browser.aurora.skin.enabled so the
+ * stock UI is untouched when the pref is off, and scoped to themed windows
+ * (lwtheme) so stock themes keep their standard look. The accent follows the
+ * active theme's tab line color, falling back to the Aurora accent. */
+
+@media -moz-pref("browser.aurora.skin.enabled") {
+  :root[lwtheme] {
+    --aurora-accent: var(--lwt-tab-line-color, #8a9bff);
+    --aurora-glow: color-mix(in srgb, var(--aurora-accent) 35%, transparent);
+    --aurora-glow-strong: color-mix(in srgb, var(--aurora-accent) 55%, transparent);
+    --focus-outline-color: var(--aurora-accent);
+  }
+
+  :root[lwtheme] .tab-background:is([selected], [multiselected]) {
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 0 6px var(--aurora-glow);
+  }
+
+  :root[lwtheme] .tabbrowser-tab[busy] .tab-background {
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 0 8px var(--aurora-glow-strong);
+  }
+
+  :root[lwtheme] #urlbar[focused] .urlbar-background {
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 0 10px var(--aurora-glow);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tab-background {
+      transition:
+        background-color 150ms ease,
+        box-shadow 250ms ease;
+    }
+
+    .toolbarbutton-1 {
+      transition: background-color 150ms ease;
+    }
+
+    .toolbarbutton-1 .toolbarbutton-icon {
+      transition: transform 150ms ease;
+    }
+
+    .toolbarbutton-1:hover:not([disabled]) .toolbarbutton-icon {
+      transform: translateY(-1px);
+    }
+
+    .urlbar-background {
+      transition: box-shadow 250ms ease;
+    }
+  }
+}
+
+/* Liquid Glass mode: frosted translucency and soft depth over the active
+ * theme's wallpaper. Enabled from settings; designed for the aurora-glass
+ * built-in theme but works with any theme using translucent toolbar colors. */
+
+@media -moz-pref("browser.aurora.liquidGlass.enabled") {
+  :root[lwtheme] :is(#nav-bar, #PersonalToolbar) {
+    backdrop-filter: blur(28px) saturate(160%);
+  }
+
+  :root[lwtheme] .urlbar-background {
+    backdrop-filter: blur(28px) saturate(160%);
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 8px 24px rgba(20, 30, 60, 0.12);
+  }
+
+  :root[lwtheme] .tab-background:is([selected], [multiselected]) {
+    backdrop-filter: blur(28px) saturate(160%);
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+    box-shadow: 0 4px 14px rgba(20, 30, 60, 0.12);
+  }
+
+  :root[lwtheme] #sidebar-box {
+    backdrop-filter: blur(28px) saturate(160%);
+  }
+}

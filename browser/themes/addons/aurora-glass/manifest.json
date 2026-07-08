@@ -1,0 +1,66 @@
+{
+  "manifest_version": 2,
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "firefox-aurora-glass@mozilla.org"
+    }
+  },
+
+  "name": "Liquid Glass",
+  "description": "A translucent, frosted appearance with soft depth.",
+  "author": "Mozilla",
+  "version": "1.0.0",
+
+  "icons": { "32": "icon.svg" },
+
+  "theme": {
+    "images": {
+      "additional_backgrounds": ["background-glass.svg"]
+    },
+
+    "properties": {
+      "additional_backgrounds_alignment": ["center top"],
+      "additional_backgrounds_tiling": ["no-repeat"],
+      "additional_backgrounds_size": ["cover"],
+      "color_scheme": "light"
+    },
+
+    "colors": {
+      "frame": "#e8edf7",
+      "frame_inactive": "#e3e8f2",
+      "toolbar": "rgba(255, 255, 255, 0.42)",
+      "toolbar_text": "#1b2733",
+      "toolbar_field": "rgba(255, 255, 255, 0.55)",
+      "toolbar_field_text": "#1b2733",
+      "toolbar_field_focus": "rgba(255, 255, 255, 0.78)",
+      "toolbar_field_text_focus": "#101820",
+      "toolbar_field_border": "transparent",
+      "toolbar_field_border_focus": "rgba(91, 124, 250, 0.7)",
+      "toolbar_field_highlight": "rgba(91, 124, 250, 0.28)",
+      "toolbar_top_separator": "transparent",
+      "toolbar_bottom_separator": "rgba(27, 39, 51, 0.08)",
+      "tab_text": "#101820",
+      "tab_background_text": "#2c3a49",
+      "tab_line": "#5b7cfa",
+      "tab_loading": "#5b7cfa",
+      "bookmark_text": "#1b2733",
+      "icons": "#3a4a5c",
+      "icons_attention": "#5b7cfa",
+      "button_background_hover": "rgba(255, 255, 255, 0.5)",
+      "button_background_active": "rgba(255, 255, 255, 0.7)",
+      "popup": "rgba(255, 255, 255, 0.88)",
+      "popup_text": "#1b2733",
+      "popup_border": "rgba(255, 255, 255, 0.9)",
+      "popup_highlight": "rgba(91, 124, 250, 0.18)",
+      "popup_highlight_text": "#101820",
+      "sidebar": "rgba(255, 255, 255, 0.6)",
+      "sidebar_text": "#1b2733",
+      "sidebar_border": "rgba(27, 39, 51, 0.08)",
+      "sidebar_highlight": "rgba(91, 124, 250, 0.18)",
+      "sidebar_highlight_text": "#101820",
+      "ntp_background": "#eef2f9",
+      "ntp_text": "#1b2733"
+    }
+  }
+}

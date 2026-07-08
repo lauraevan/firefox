@@ -1,4 +1,10 @@
-# Build Plan: GX-style themed Firefox fork with bundled uBlock Origin
+# Build Plan: premium customizable Firefox fork with bundled uBlock Origin
+
+Direction (updated): not an Opera GX clone. The goal is a premium,
+customizable browser — wallpaper-first theming, unique layout with tasteful
+custom animations, an optional Liquid Glass mode toggled from settings, and
+built-in uBlock Origin for privacy. The internal codename for the theming
+system is "aurora".
 
 Goal: an Opera GX–inspired browser built on Firefox source, with user-selectable
 chrome wallpapers, an optional "Liquid Glass" translucency mode, a polished
@@ -61,13 +67,13 @@ The static theme manifest already supports almost the whole GX look:
   document.
 
 **Plan:**
-1. Create `browser/themes/addons/gx-dark/` (and a few accent variants) as
+1. Create `browser/themes/addons/aurora/` (and a few accent variants) as
    static themes. Register in `BuiltInThemeConfig.sys.mjs` and
    `browser/themes/addons/jar.mn`. Set the default theme pref
    (`extensions.activeThemeID`) in `browser/app/profile/firefox.js`.
 2. For **user-selectable wallpaper + accent color** (arbitrary combinations,
    user-supplied images), static variants don't scale. Add a small in-tree
-   module, e.g. `browser/components/gxtheme/GXThemeManager.sys.mjs`, that
+   module, e.g. `browser/components/auroratheme/AuroraThemeManager.sys.mjs`, that
    composes a theme object from prefs (wallpaper path, accent color, mode) and
    applies it the same way dynamic themes do. Two implementation options:
    - a built-in WebExtension using the `theme.update()` API (the Firefox Color
@@ -83,14 +89,14 @@ The static theme manifest already supports almost the whole GX look:
 Theme API can't do animation, glow effects, or reshape elements. For that, add
 your own stylesheet:
 
-- New file `browser/themes/shared/gx-skin.css`, registered in
+- New file `browser/themes/shared/aurora-skin.css`, registered in
   `browser/themes/shared/jar.mn` and imported from one place
   (e.g. appended to the imports in `browser-shared.css` — a one-line diff).
 - Gate every rule on your pref using the in-tree pref media query, which
   upstream itself uses heavily:
 
   ```css
-  @media -moz-pref("browser.gx.skin.enabled") {
+  @media -moz-pref("browser.aurora.skin.enabled") {
     .tabbrowser-tab:hover { /* glow, transitions, ... */ }
   }
   ```
@@ -117,7 +123,7 @@ aesthetic is Layers A+B.
 Ship as another built-in theme + a pref-gated section of the skin CSS:
 
 - Theme sets `frame`/`toolbar` colors to semi-transparent values.
-- Skin CSS (gated on `browser.gx.liquidGlass.enabled`) applies translucency and
+- Skin CSS (gated on `browser.aurora.liquidGlass.enabled`) applies translucency and
   blur to chrome surfaces. In-content panels/menus can use `backdrop-filter`.
 - **macOS:** the widget layer already supports vibrancy —
   `widget/cocoa/VibrancyManager.{h,mm}` manages vibrant window regions (used
@@ -132,11 +138,11 @@ Ship as another built-in theme + a pref-gated section of the skin CSS:
   translucency-over-wallpaper is the portable v1.
 
 **Deliverables for Phase 1**
-- [x] `browser/themes/addons/gx/` built-in theme, registered (variants pending)
-- [ ] `browser/components/gxtheme/` dynamic theme engine (wallpaper + accent)
-- [x] `browser/themes/shared/gx-skin.css` with pref-gated effects
-- [x] `browser.gx.*` prefs in `firefox.js` (GX theme is the default)
-- [ ] Liquid Glass theme variant + CSS; macOS vibrancy as stretch goal
+- [x] `browser/themes/addons/aurora/` built-in theme, registered
+- [ ] `browser/components/auroratheme/` dynamic theme engine (wallpaper + accent)
+- [x] `browser/themes/shared/aurora-skin.css` with pref-gated effects
+- [x] `browser.aurora.*` prefs in `firefox.js` (Aurora theme is the default)
+- [x] Liquid Glass theme variant + CSS (settings-toggled); macOS vibrancy as stretch goal
 
 ---
 
@@ -158,10 +164,10 @@ newtab do). The current stack — and what you should build on — is:
 
 **Plan:**
 1. Add a **"Theme" category** to about:preferences:
-   - New config module `browser/components/preferences/config/gxTheme.mjs`
-     defining groups: theme mode (GX / Liquid Glass / stock), accent color
+   - New config module `browser/components/preferences/config/auroraTheme.mjs`
+     defining groups: theme mode (Aurora / Liquid Glass / stock), accent color
      (`moz-input-color` or a swatch `moz-radio-group`), wallpaper picker,
-     effects toggles (animations, glow), each bound to a `browser.gx.*` pref.
+     effects toggles (animations, glow), each bound to a `browser.aurora.*` pref.
    - Register it in `SettingPaneManager.mjs` and add the category entry +
      Fluent strings (new `.ftl` file in `browser/locales/en-US/browser/`).
 2. **Live preview is nearly free:** theme changes via the theme API /
@@ -179,7 +185,7 @@ same moz-* widgets) is possible but only worth it if the design outgrows
 preferences. Start inside about:preferences.
 
 **Deliverables for Phase 2**
-- [ ] `config/gxTheme.mjs` pane + registration
+- [ ] `config/auroraTheme.mjs` pane + registration
 - [ ] Fluent strings
 - [ ] Wallpaper picker component with live apply
 - [ ] Smooth transitions: CSS view transitions / animations within the pane
@@ -266,7 +272,7 @@ attribution, and if you patch uBO itself, publish those patches.
 ## Suggested milestone order
 
 1. Static GX built-in theme + default-on (proves the pipeline, ~days)
-2. Skin CSS with effects behind `browser.gx.skin.enabled`
+2. Skin CSS with effects behind `browser.aurora.skin.enabled`
 3. Dynamic theme engine (accent + wallpaper from prefs)
 4. Settings pane with live preview
 5. uBO via distribution/extensions

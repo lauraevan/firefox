@@ -990,10 +990,12 @@ pref("browser.theme.dark-private-windows", true);
 // system theme and forced-colors palette to style the chrome.
 pref("browser.theme.forced-colors-override.enabled", true);
 
-// GX appearance: default to the built-in GX theme and enable the
-// accent-effects skin layer (see browser/themes/shared/gx-skin.css).
-pref("extensions.activeThemeID", "firefox-gx@mozilla.org");
-pref("browser.gx.skin.enabled", true);
+// Aurora appearance: default to the built-in Aurora theme and enable the
+// accent-effects skin layer (see browser/themes/shared/aurora-skin.css).
+// Liquid Glass mode is toggled from settings.
+pref("extensions.activeThemeID", "firefox-aurora@mozilla.org");
+pref("browser.aurora.skin.enabled", true);
+pref("browser.aurora.liquidGlass.enabled", false);
 
 // Pref to control whether or not Private Browsing windows show up
 // as separate icons in the Windows taskbar.
