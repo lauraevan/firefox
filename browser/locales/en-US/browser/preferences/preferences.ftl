@@ -2751,3 +2751,7 @@ aurora-accent-picker =
     .description = Colors the active tab line, glows, and focus rings.
 aurora-wallpaper-choice-flow =
     .label = Aurora Flow (animated)
+
+aurora-wallpaper-custom-button =
+    .label = Use your own wallpaper
+    .description = Pick any image file, including animated ones.

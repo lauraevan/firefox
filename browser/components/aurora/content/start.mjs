@@ -5,39 +5,20 @@
 /* Aurora Start page. Runs privileged as the new tab page; every privileged
  * call is guarded so the page also renders standalone (demos, tests). */
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
 const DEFAULT_FAVORITES = [
-  {
-    label: "YouTube",
-    url: "https://www.youtube.com",
-    glyph: "Y",
-    color: "#e53935",
-  },
-  {
-    label: "Reddit",
-    url: "https://www.reddit.com",
-    glyph: "R",
-    color: "#ff5722",
-  },
-  { label: "GitHub", url: "https://github.com", glyph: "G", color: "#30363d" },
+  { label: "YouTube", url: "https://www.youtube.com", logo: "logo-youtube" },
+  { label: "Reddit", url: "https://www.reddit.com", logo: "logo-reddit" },
+  { label: "GitHub", url: "https://github.com", logo: "logo-github" },
   {
     label: "Wikipedia",
     url: "https://www.wikipedia.org",
-    glyph: "W",
-    color: "#5c6bc0",
+    logo: "logo-wikipedia",
   },
-  { label: "X", url: "https://x.com", glyph: "X", color: "#1d9bf0" },
-  {
-    label: "Figma",
-    url: "https://www.figma.com",
-    glyph: "F",
-    color: "#a259ff",
-  },
-  {
-    label: "Notion",
-    url: "https://www.notion.so",
-    glyph: "N",
-    color: "#3b4252",
-  },
+  { label: "X", url: "https://x.com", logo: "logo-x" },
+  { label: "Figma", url: "https://www.figma.com", logo: "logo-figma" },
+  { label: "Notion", url: "https://www.notion.so", logo: "logo-notion" },
 ];
 
 const FAVORITES_PREF = "browser.aurora.favorites";
@@ -46,6 +27,14 @@ const FAVORITES_PREF = "browser.aurora.favorites";
 // page runs privileged as the new tab page.
 function services() {
   return globalThis.Services || null;
+}
+
+function chromeWindow() {
+  try {
+    return window.browsingContext.topChromeWindow;
+  } catch (e) {
+    return null;
+  }
 }
 
 function loadFavorites() {
@@ -70,21 +59,31 @@ function saveFavorites(favs) {
   }
 }
 
+function makeTileContent(fav) {
+  if (fav.logo) {
+    let svg = document.createElementNS(SVG_NS, "svg");
+    let use = document.createElementNS(SVG_NS, "use");
+    use.setAttribute("href", `#${fav.logo}`);
+    svg.appendChild(use);
+    return svg;
+  }
+  let dot = document.createElement("div");
+  dot.className = "dot";
+  dot.style.background = fav.color || "#5c6bc0";
+  dot.textContent = (fav.glyph || fav.label[0] || "?").slice(0, 1);
+  return dot;
+}
+
 function renderFavorites() {
   let grid = document.getElementById("fav-grid");
   grid.textContent = "";
-  let favs = loadFavorites();
-  for (let fav of favs) {
+  for (let fav of loadFavorites()) {
     let a = document.createElement("a");
     a.className = "fav";
     a.href = fav.url;
     let tile = document.createElement("div");
     tile.className = "tile";
-    let dot = document.createElement("div");
-    dot.className = "dot";
-    dot.style.background = fav.color || "#3b4252";
-    dot.textContent = (fav.glyph || fav.label[0] || "?").slice(0, 1);
-    tile.appendChild(dot);
+    tile.appendChild(makeTileContent(fav));
     let label = document.createElement("span");
     label.textContent = fav.label;
     a.append(tile, label);
@@ -194,11 +193,54 @@ function renderChart(values) {
 
 function openAssistant() {
   try {
-    let win = window.browsingContext.topChromeWindow;
-    win.SidebarController.show("viewGenaiChatSidebar");
+    chromeWindow().SidebarController.show("viewGenaiChatSidebar");
   } catch (e) {
     window.location.href = "about:preferences#ai";
   }
+}
+
+// Premium multitasking: put this tab and a fresh one side by side using the
+// browser's native split view.
+function openSplitView() {
+  try {
+    let win = chromeWindow();
+    let gBrowser = win.gBrowser;
+    let svc = services();
+    let newTab = gBrowser.addTab("about:newtab", {
+      triggeringPrincipal: svc.scriptSecurityManager.getSystemPrincipal(),
+    });
+    gBrowser.addTabSplitView([gBrowser.selectedTab, newTab]);
+  } catch (e) {}
+}
+
+function openPrivateWindow() {
+  try {
+    chromeWindow().OpenBrowserWindow({ private: true });
+  } catch (e) {}
+}
+
+function openWallpaperSettings() {
+  window.location.href = "about:preferences#appearance";
+}
+
+// Gentle parallax: the sky layer drifts a few pixels toward the pointer.
+function initParallax() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+  let sky = document.querySelector(".sky");
+  let raf = 0;
+  document.addEventListener("pointermove", event => {
+    if (raf) {
+      return;
+    }
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      let x = (event.clientX / innerWidth - 0.5) * 14;
+      let y = (event.clientY / innerHeight - 0.5) * 9;
+      sky.style.translate = `${x}px ${y}px`;
+    });
+  });
 }
 
 document.getElementById("search-form").addEventListener("submit", submitSearch);
@@ -208,6 +250,14 @@ document
 document.getElementById("scroll-down").addEventListener("click", () => {
   document.querySelector(".favorites").scrollIntoView({ behavior: "smooth" });
 });
+document.getElementById("tool-split").addEventListener("click", openSplitView);
+document
+  .getElementById("tool-private")
+  .addEventListener("click", openPrivateWindow);
+document
+  .getElementById("tool-wallpapers")
+  .addEventListener("click", openWallpaperSettings);
 
 renderFavorites();
 updatePrivacy();
+initParallax();

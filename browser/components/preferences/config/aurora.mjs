@@ -63,6 +63,28 @@ Preferences.addSetting({
   },
 });
 
+Preferences.addSetting({
+  id: "aurora-wallpaper-custom",
+  onUserClick(event) {
+    event.preventDefault();
+    // @ts-ignore topChromeWindow global
+    let win = window.browsingContext.topChromeWindow;
+    let fp = win.Cc["@mozilla.org/filepicker;1"].createInstance(
+      win.Ci.nsIFilePicker
+    );
+    fp.init(win.browsingContext, "", win.Ci.nsIFilePicker.modeOpen);
+    fp.appendFilters(win.Ci.nsIFilePicker.filterImages);
+    fp.open(result => {
+      if (result == win.Ci.nsIFilePicker.returnOK && fp.fileURL) {
+        Services.prefs.setStringPref(
+          "browser.aurora.wallpaper",
+          fp.fileURL.spec
+        );
+      }
+    });
+  },
+});
+
 SettingGroupManager.registerGroups({
   aurora: {
     l10nId: "aurora-appearance-group",
@@ -143,6 +165,11 @@ SettingGroupManager.registerGroups({
             },
           },
         ],
+      },
+      {
+        id: "aurora-wallpaper-custom",
+        l10nId: "aurora-wallpaper-custom-button",
+        control: "moz-box-button",
       },
     ],
   },

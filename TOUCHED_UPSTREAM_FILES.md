@@ -24,7 +24,7 @@ New directories/files (no merge cost):
 
 - `browser/themes/addons/aurora/` and `browser/themes/addons/aurora-glass/` (built-in themes)
 - `browser/themes/shared/aurora-skin.css` (pref-gated effects and Liquid Glass layer)
-- `browser/components/aurora/` (wallpaper engine + bundled wallpapers)
+- `browser/components/aurora/` (wallpaper engine, Aurora Start page, AuroraShield tracker counter)
 - `browser/components/preferences/config/aurora.mjs` (settings group)
 - `browser/extensions/ublock/` (uBlock Origin vendoring + packaging)
 - `browser/branding/aurora/` (Aurora Browser branding)

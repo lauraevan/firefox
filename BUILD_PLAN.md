@@ -139,7 +139,7 @@ Ship as another built-in theme + a pref-gated section of the skin CSS:
 
 **Deliverables for Phase 1**
 - [x] `browser/themes/addons/aurora/` built-in theme, registered
-- [x] `browser/components/aurora/AuroraThemeManager.sys.mjs` wallpaper engine (accent picker pending)
+- [x] `browser/components/aurora/AuroraThemeManager.sys.mjs` wallpaper + accent engine
 - [x] `browser/themes/shared/aurora-skin.css` with pref-gated effects
 - [x] `browser.aurora.*` prefs in `firefox.js` (Aurora theme is the default)
 - [x] Liquid Glass theme variant + CSS (settings-toggled); macOS vibrancy as stretch goal
@@ -187,7 +187,7 @@ preferences. Start inside about:preferences.
 **Deliverables for Phase 2**
 - [x] `config/aurora.mjs` group in the appearance pane
 - [x] Fluent strings
-- [x] Wallpaper picker (bundled wallpapers) with live apply; custom file picker pending
+- [x] Wallpaper picker with live apply, including a custom image file picker
 - [ ] Smooth transitions: CSS view transitions / animations within the pane
 
 ---
