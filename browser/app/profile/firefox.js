@@ -998,6 +998,10 @@ pref("browser.aurora.skin.enabled", true);
 pref("browser.aurora.liquidGlass.enabled", false);
 pref("browser.aurora.wallpaper", "default");
 pref("browser.aurora.accent", "");
+pref("browser.aurora.startpage.enabled", true);
+// Premium defaults: revamped sidebar rail and strict tracking protection.
+pref("sidebar.revamp", true);
+pref("browser.contentblocking.category", "strict");
 
 // Pref to control whether or not Private Browsing windows show up
 // as separate icons in the Windows taskbar.

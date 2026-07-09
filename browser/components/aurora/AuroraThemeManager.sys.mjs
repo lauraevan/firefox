@@ -10,8 +10,16 @@
  * or a file:// URL for a custom image.
  */
 
+const lazy = {};
+ChromeUtils.defineESModuleGetters(lazy, {
+  AboutNewTab: "resource:///modules/AboutNewTab.sys.mjs",
+  AuroraShield: "resource:///modules/AuroraShield.sys.mjs",
+});
+
 const PREF_WALLPAPER = "browser.aurora.wallpaper";
 const PREF_ACCENT = "browser.aurora.accent";
+const PREF_STARTPAGE = "browser.aurora.startpage.enabled";
+const START_PAGE_URL = "chrome://browser/content/aurora/start.html";
 
 const BUNDLED_WALLPAPERS = new Map([
   ["aurora", "resource://builtin-themes/aurora/background-aurora.svg"],
@@ -42,6 +50,11 @@ export const AuroraThemeManager = {
     Services.prefs.addObserver(PREF_ACCENT, this);
     Services.obs.addObserver(this, "browser-delayed-startup-finished");
     Services.obs.addObserver(this, "lightweight-theme-styling-update");
+
+    if (Services.prefs.getBoolPref(PREF_STARTPAGE, false)) {
+      lazy.AboutNewTab.newTabURL = START_PAGE_URL;
+    }
+    lazy.AuroraShield.init();
   },
 
   observe(subject, topic) {

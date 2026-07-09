@@ -125,3 +125,7 @@
     backdrop-filter: blur(28px) saturate(160%);
   }
 }
+
+#aurora-shield-button {
+  list-style-image: url("chrome://global/skin/icons/security.svg");
+}

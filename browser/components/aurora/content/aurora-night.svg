@@ -1,0 +1,63 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="an-sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b0e1e"/>
+      <stop offset="0.45" stop-color="#181336"/>
+      <stop offset="0.7" stop-color="#3a2657"/>
+      <stop offset="0.85" stop-color="#1a1638"/>
+      <stop offset="1" stop-color="#0d1024"/>
+    </linearGradient>
+    <linearGradient id="an-ribbon1" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#52d8c6" stop-opacity="0"/>
+      <stop offset="0.4" stop-color="#5fe0b8" stop-opacity="0.55"/>
+      <stop offset="0.75" stop-color="#8a9bff" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#c78ad6" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="an-ribbon2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#a58aff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#c78ad6" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#52d8c6" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="an-glow" cx="0.5" cy="0.42" r="0.45">
+      <stop offset="0" stop-color="#b48aff" stop-opacity="0.4"/>
+      <stop offset="0.6" stop-color="#7a5fd0" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#7a5fd0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="an-soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="45"/>
+    </filter>
+    <linearGradient id="an-mtn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141230"/>
+      <stop offset="1" stop-color="#0a0c1c"/>
+    </linearGradient>
+    <linearGradient id="an-water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c1840"/>
+      <stop offset="1" stop-color="#0a0d1f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#an-sky)"/>
+  <g filter="url(#an-soft)">
+    <path d="M -80 620 C 300 380 520 560 900 330 C 1240 130 1500 320 2000 90 L 2000 -80 L -80 -80 Z" fill="url(#an-ribbon1)" opacity="0.8"/>
+    <path d="M -80 460 C 420 300 700 430 1100 240 C 1420 100 1680 220 2000 60 L 2000 -80 L -80 -80 Z" fill="url(#an-ribbon2)" opacity="0.6"/>
+  </g>
+  <rect width="1920" height="1080" fill="url(#an-glow)"/>
+  <g fill="#dfe6ff">
+    <circle cx="140" cy="120" r="1.6" opacity="0.9"/><circle cx="320" cy="220" r="1.1" opacity="0.6"/>
+    <circle cx="520" cy="90" r="1.4" opacity="0.8"/><circle cx="700" cy="180" r="1" opacity="0.5"/>
+    <circle cx="880" cy="70" r="1.3" opacity="0.75"/><circle cx="1060" cy="150" r="1.1" opacity="0.6"/>
+    <circle cx="1240" cy="90" r="1.5" opacity="0.85"/><circle cx="1430" cy="200" r="1" opacity="0.55"/>
+    <circle cx="1620" cy="110" r="1.4" opacity="0.8"/><circle cx="1790" cy="230" r="1.2" opacity="0.65"/>
+    <circle cx="240" cy="330" r="1" opacity="0.5"/><circle cx="980" cy="280" r="1.1" opacity="0.55"/>
+    <circle cx="1520" cy="330" r="1" opacity="0.5"/><circle cx="1700" cy="60" r="1.1" opacity="0.6"/>
+    <circle cx="60" cy="260" r="1.2" opacity="0.6"/><circle cx="420" cy="160" r="1" opacity="0.5"/>
+  </g>
+  <path d="M -10 780 L 260 560 L 420 700 L 640 520 L 860 760 L 1020 640 L 1240 800 L 1490 580 L 1700 740 L 1930 620 L 1930 1090 L -10 1090 Z" fill="url(#an-mtn)"/>
+  <path d="M -10 840 L 200 700 L 460 830 L 760 690 L 1050 850 L 1350 720 L 1620 840 L 1930 740 L 1930 1090 L -10 1090 Z" fill="#0b0d20"/>
+  <rect y="880" width="1920" height="200" fill="url(#an-water)"/>
+  <g opacity="0.25" filter="url(#an-soft)">
+    <path d="M 400 900 L 1500 900 L 1500 1050 L 400 1050 Z" fill="#7a5fd0"/>
+  </g>
+</svg>
