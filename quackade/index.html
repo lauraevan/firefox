@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quackade</title>
+    <meta name="description" content="A pond-sized arcade — hundreds of games, one click to play." />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%A6%86%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand-wrap">
+        <span class="logo" aria-hidden="true">🦆</span>
+        <div class="brand-text">
+          <h1 id="brand">Quackade</h1>
+          <p id="tagline" class="tagline">the pond's arcade</p>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <input
+          id="search"
+          type="search"
+          placeholder="Search games…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <div id="count" class="count">loading the pond…</div>
+    </header>
+
+    <nav id="chips" class="chips" aria-label="Filter by source"></nav>
+
+    <main>
+      <section id="grid" class="grid" aria-label="Games"></section>
+      <p id="empty" class="empty" hidden>No games match your search.</p>
+      <div id="sentinel" class="sentinel" aria-hidden="true"></div>
+    </main>
+
+    <footer class="foot">
+      <span
+        >Games are streamed from their original creators' public mirrors.
+        Quackade just puts them on one shelf.</span
+      >
+    </footer>
+
+    <div id="overlay" class="overlay" hidden>
+      <div class="player-bar">
+        <div class="player-meta">
+          <span id="p-source" class="p-source"></span>
+          <span id="p-title" class="p-title"></span>
+        </div>
+        <div class="player-actions">
+          <button id="p-mirror" class="pbtn" hidden>Mirror</button>
+          <button id="p-full" class="pbtn">Fullscreen</button>
+          <button id="p-new" class="pbtn">Open ↗</button>
+          <button id="p-close" class="pbtn close">Close ✕</button>
+        </div>
+      </div>
+      <iframe
+        id="frame"
+        class="frame"
+        title="Game"
+        allow="autoplay; fullscreen; gamepad; microphone; camera; clipboard-write"
+        allowfullscreen
+      ></iframe>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

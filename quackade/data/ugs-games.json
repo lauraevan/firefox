@@ -1,0 +1,22 @@
+[
+  {
+    "title": "2048",
+    "url": "https://cdn.jsdelivr.net/gh/ubg-py/the-game-stash@main/2048/2048.html"
+  },
+  {
+    "title": "1v1.LOL",
+    "url": "https://cdn.jsdelivr.net/gh/ubg-py/the-game-stash@main/1v1lol/1v1lol.html"
+  },
+  {
+    "title": "8 Ball Pool",
+    "url": "https://cdn.jsdelivr.net/gh/ubg-py/the-game-stash@main/cl8ballpool.html"
+  },
+  {
+    "title": "99 Balls",
+    "url": "https://cdn.jsdelivr.net/gh/ubg-py/the-game-stash@main/cl99balls.html"
+  },
+  {
+    "title": "60 Seconds Santa Run",
+    "url": "https://cdn.jsdelivr.net/gh/ubg-py/the-game-stash@main/cl60secondssantarun.html"
+  }
+]
