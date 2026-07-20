@@ -25,12 +25,43 @@ function init() {
   els.count = document.getElementById("count");
   els.sentinel = document.getElementById("sentinel");
   els.empty = document.getElementById("empty");
+  els.loader = document.getElementById("loader");
 
+  initTheme();
   buildChips();
   wireSearch();
   wirePlayer();
   wireInfiniteScroll();
   loadAll();
+}
+
+// --- theme (auto -> light -> dark) -----------------------------------------
+const THEME_KEY = "expo-theme";
+const THEME_ICONS = {
+  auto: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 2a7 7 0 0 1 0 14V5Z" fill="currentColor"/></svg>',
+  light:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5 5l1.8 1.8M17.2 17.2 19 19M19 5l-1.8 1.8M6.8 17.2 5 19"/></svg>',
+  dark: '<svg viewBox="0 0 24 24"><path d="M20.2 14.7A8.6 8.6 0 0 1 9.3 3.8 8.6 8.6 0 1 0 20.2 14.7Z" fill="currentColor"/></svg>',
+};
+
+function initTheme() {
+  els.themeBtn = document.getElementById("theme-btn");
+  renderTheme(localStorage.getItem(THEME_KEY) || "auto");
+  els.themeBtn.addEventListener("click", () => {
+    const cur = localStorage.getItem(THEME_KEY) || "auto";
+    const next = cur === "auto" ? "light" : cur === "light" ? "dark" : "auto";
+    if (next === "auto") localStorage.removeItem(THEME_KEY);
+    else localStorage.setItem(THEME_KEY, next);
+    renderTheme(next);
+  });
+}
+
+function renderTheme(mode) {
+  const root = document.documentElement;
+  if (mode === "light" || mode === "dark") root.dataset.theme = mode;
+  else delete root.dataset.theme;
+  els.themeBtn.innerHTML = THEME_ICONS[mode];
+  els.themeBtn.title = `Theme: ${mode}`;
 }
 
 // --- source filter chips --------------------------------------------------
@@ -64,7 +95,16 @@ function setChipCount(id, n, status) {
 
 // --- loading --------------------------------------------------------------
 function loadAll() {
-  SOURCES.filter((s) => s.enabled).forEach((s) => {
+  const enabled = SOURCES.filter((s) => s.enabled);
+  let settled = 0;
+  const done = () => {
+    settled++;
+    if (settled === enabled.length && state.all.length === 0) {
+      els.loader.hidden = true;
+      els.count.textContent = "couldn't reach any game source";
+    }
+  };
+  enabled.forEach((s) => {
     setChipCount(s.id, 0, "loading");
     PROVIDERS[s.id]()
       .then((games) => {
@@ -76,12 +116,14 @@ function loadAll() {
       .catch((err) => {
         console.error(`[${s.id}]`, err);
         setChipCount(s.id, 0, "error");
-      });
+      })
+      .finally(done);
   });
 }
 
 // --- filtering / rendering ------------------------------------------------
 function applyFilter() {
+  if (state.all.length > 0) els.loader.hidden = true;
   const q = state.query.trim().toLowerCase();
   state.filtered = state.all
     .filter((g) => state.active.has(g.source))
@@ -98,7 +140,7 @@ function updateCount() {
   const shown = state.filtered.length;
   els.count.textContent =
     total === 0
-      ? "loading the pond…"
+      ? "loading games…"
       : `${shown.toLocaleString()} game${shown === 1 ? "" : "s"}` +
         (shown !== total ? ` of ${total.toLocaleString()}` : "");
   els.empty.hidden = shown !== 0;

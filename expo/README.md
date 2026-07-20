@@ -1,8 +1,8 @@
-# Quackade
+# Expo
 
-A Duck-Math-style game catalog: a wall of square game tiles you click to play
-in a fullscreen embed. It pulls several public game catalogs live at runtime and
-puts them all on one shelf.
+A Duck-Math-style game catalog with a Material 3 Expressive skin: a wall of
+square game tiles you click to play in a fullscreen embed. It pulls several
+public game catalogs live at runtime and puts them all on one shelf.
 
 ## What's inside
 
@@ -19,20 +19,39 @@ That's **~2,380 games** out of the box.
 Each source provides its own cover art. Games that ship without a cover fall back
 to a game-controller icon.
 
+## Theme
+
+The UI follows Material 3 Expressive: baseline M3 color tokens (seed `#6750A4`)
+with light and dark schemes, Roboto Flex type, pill search bar, filter chips,
+tonal buttons, springy shape-morphing on hover/press, and a shape-morph loading
+indicator. Theme follows the system by default; the header button cycles
+auto / light / dark (persisted in `localStorage`).
+
 ## Running / hosting
 
 It's a fully static site. Serve it over HTTP(S) from any static host
-(GitHub Pages, Netlify, Vercel, or `python3 -m http.server`). It uses `fetch`
-and ES modules, so it will **not** work from a `file://` URL — it needs a server.
+(GitHub Pages, Netlify, Vercel, githack, or `python3 -m http.server`). It uses
+`fetch` and ES modules, so it will **not** work from a `file://` URL — it needs
+a server.
 
 ```
-cd quackade
+cd expo
 python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
 Every path is relative, so it also works from a project subpath such as
-`https://you.github.io/quackade/`.
+`https://you.github.io/expo/` or a githack URL.
+
+### Deploying via githack
+
+githack serves files straight from this GitHub repo with correct content-types,
+so the site runs from it with no build step:
+
+- Development (tracks the branch, short CDN cache):
+  `https://raw.githack.com/<owner>/<repo>/<branch>/expo/index.html`
+- Production (permanent CDN cache — pin a commit hash, not a branch):
+  `https://rawcdn.githack.com/<owner>/<repo>/<commit-sha>/expo/index.html`
 
 ### A note on mirrors
 
@@ -67,5 +86,5 @@ mirrored in the same ecosystem the doc curates). To add more, append entries:
 
 ## Credits
 
-All games belong to their original creators. Quackade only links to their
-existing public mirrors; it does not host or modify any game.
+All games belong to their original creators. Expo only links to their existing
+public mirrors; it does not host or modify any game.

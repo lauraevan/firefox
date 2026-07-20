@@ -1,0 +1,621 @@
+/* Material 3 Expressive theme. Color tokens follow the M3 baseline scheme
+   (seed #6750A4); light is the default, dark applies via prefers-color-scheme
+   or an explicit html[data-theme] override set by the in-page toggle. */
+
+:root {
+  --primary: #6750a4;
+  --on-primary: #ffffff;
+  --primary-c: #eaddff;
+  --on-primary-c: #21005d;
+  --secondary-c: #e8def8;
+  --on-secondary-c: #1d192b;
+  --tertiary-c: #ffd8e4;
+  --on-tertiary-c: #31111d;
+  --error: #b3261e;
+  --error-c: #f9dedc;
+  --on-error-c: #410e0b;
+  --surface: #fef7ff;
+  --surface-dim: #ded8e1;
+  --on-surface: #1d1b20;
+  --on-surface-var: #49454f;
+  --sc-lowest: #ffffff;
+  --sc-low: #f7f2fa;
+  --sc: #f3edf7;
+  --sc-high: #ece6f0;
+  --sc-highest: #e6e0e9;
+  --outline: #79747e;
+  --outline-var: #cac4d0;
+  --scrim: rgba(29, 27, 32, 0.4);
+
+  --shape-s: 12px;
+  --shape-m: 18px;
+  --shape-l: 26px;
+  --shape-full: 999px;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --standard: cubic-bezier(0.2, 0, 0, 1);
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 3px 1px rgba(0, 0, 0, 0.08);
+  --elev-3: 0 4px 8px 3px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.18);
+  --tile: 138px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --primary: #d0bcff;
+    --on-primary: #381e72;
+    --primary-c: #4f378b;
+    --on-primary-c: #eaddff;
+    --secondary-c: #4a4458;
+    --on-secondary-c: #e8def8;
+    --tertiary-c: #633b48;
+    --on-tertiary-c: #ffd8e4;
+    --error: #f2b8b5;
+    --error-c: #8c1d18;
+    --on-error-c: #f9dedc;
+    --surface: #141218;
+    --surface-dim: #141218;
+    --on-surface: #e6e0e9;
+    --on-surface-var: #cac4d0;
+    --sc-lowest: #0f0d13;
+    --sc-low: #1d1b20;
+    --sc: #211f26;
+    --sc-high: #2b2930;
+    --sc-highest: #36343b;
+    --outline: #938f99;
+    --outline-var: #49454f;
+    --scrim: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --primary: #d0bcff;
+  --on-primary: #381e72;
+  --primary-c: #4f378b;
+  --on-primary-c: #eaddff;
+  --secondary-c: #4a4458;
+  --on-secondary-c: #e8def8;
+  --tertiary-c: #633b48;
+  --on-tertiary-c: #ffd8e4;
+  --error: #f2b8b5;
+  --error-c: #8c1d18;
+  --on-error-c: #f9dedc;
+  --surface: #141218;
+  --surface-dim: #141218;
+  --on-surface: #e6e0e9;
+  --on-surface-var: #cac4d0;
+  --sc-lowest: #0f0d13;
+  --sc-low: #1d1b20;
+  --sc: #211f26;
+  --sc-high: #2b2930;
+  --sc-highest: #36343b;
+  --outline: #938f99;
+  --outline-var: #49454f;
+  --scrim: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--on-surface);
+  font: 15px/1.45 "Roboto Flex", system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+  min-height: 100vh;
+}
+
+body.locked {
+  overflow: hidden;
+}
+
+/* ---- sticky header (top bar + chips as one surface) ---- */
+.hdr {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--outline-var);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 24px 8px;
+}
+
+.brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.logo {
+  width: 34px;
+  height: 34px;
+  color: var(--primary);
+  flex: none;
+  animation: logo-in 0.9s var(--spring);
+}
+
+@keyframes logo-in {
+  from {
+    transform: rotate(-90deg) scale(0.4);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: var(--on-surface);
+}
+
+.tagline {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--on-surface-var);
+  letter-spacing: 0.4px;
+}
+
+/* M3 search bar: full pill on surface-container-high */
+.search-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.searchbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(560px, 100%);
+  height: 52px;
+  padding: 0 20px;
+  border-radius: var(--shape-full);
+  background: var(--sc-high);
+  color: var(--on-surface-var);
+  transition: box-shadow 0.15s var(--standard), background 0.15s;
+}
+
+.searchbar svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.searchbar:focus-within {
+  background: var(--sc-highest);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+#search {
+  flex: 1;
+  border: 0;
+  background: none;
+  color: var(--on-surface);
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+}
+
+#search::placeholder {
+  color: var(--on-surface-var);
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.count {
+  color: var(--on-surface-var);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.iconbtn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--shape-full);
+  background: transparent;
+  color: var(--on-surface-var);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-radius 0.25s var(--spring);
+}
+
+.iconbtn:hover {
+  background: color-mix(in srgb, var(--on-surface) 8%, transparent);
+}
+
+.iconbtn:active {
+  background: color-mix(in srgb, var(--on-surface) 12%, transparent);
+  border-radius: var(--shape-s);
+}
+
+.iconbtn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ---- M3 filter chips ---- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 24px 14px;
+}
+
+.chip {
+  --c: #888;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--outline-var);
+  background: transparent;
+  color: var(--on-surface-var);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, border-radius 0.25s var(--spring),
+    transform 0.25s var(--spring);
+}
+
+.chip .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c);
+  opacity: 0.4;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.chip .n {
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.chip.on {
+  color: var(--on-surface);
+  border-color: transparent;
+  background: color-mix(in srgb, var(--c) 24%, var(--sc-low));
+}
+
+.chip.on .dot {
+  opacity: 1;
+  box-shadow: 0 0 8px var(--c);
+}
+
+.chip:hover {
+  transform: translateY(-1px);
+}
+
+.chip:active {
+  border-radius: var(--shape-s);
+  transform: scale(0.97);
+}
+
+.chip.err {
+  border-color: var(--error);
+}
+
+.chip.err .n {
+  color: var(--error);
+}
+
+/* ---- loading indicator (rotating shape-morph) ---- */
+.loader-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 90px 0 40px;
+}
+
+.loader {
+  width: 46px;
+  height: 46px;
+  background: var(--primary);
+  animation: loader-spin 1.5s linear infinite,
+    loader-morph 1.5s ease-in-out infinite;
+}
+
+@keyframes loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-morph {
+  0%,
+  100% {
+    border-radius: 50%;
+  }
+  50% {
+    border-radius: 27%;
+  }
+}
+
+/* ---- grid ---- */
+main {
+  padding: 22px 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr));
+  gap: 14px;
+}
+
+.tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--shape-l);
+  background: var(--sc-low);
+  overflow: hidden;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  box-shadow: var(--elev-1);
+  transition: transform 0.3s var(--spring), box-shadow 0.2s var(--standard),
+    border-radius 0.3s var(--spring);
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--sc-high);
+}
+
+.tile img.placeholder {
+  object-fit: contain;
+  padding: 24%;
+}
+
+.tile .tlabel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px 11px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.82));
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.16s, transform 0.25s var(--spring);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tile .tbadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.16s;
+}
+
+/* shape morph on hover: card corners tighten while it lifts */
+.tile:hover,
+.tile:focus-visible {
+  transform: translateY(-5px) scale(1.025);
+  border-radius: var(--shape-m);
+  box-shadow: var(--elev-3);
+  outline: none;
+}
+
+.tile:focus-visible {
+  box-shadow: var(--elev-3), 0 0 0 3px var(--primary);
+}
+
+.tile:active {
+  transform: scale(0.96);
+}
+
+.tile:hover .tlabel,
+.tile:focus-visible .tlabel {
+  opacity: 1;
+  transform: none;
+}
+
+.tile:hover .tbadge,
+.tile:focus-visible .tbadge {
+  opacity: 1;
+}
+
+.empty {
+  text-align: center;
+  color: var(--on-surface-var);
+  padding: 60px 0;
+}
+
+.sentinel {
+  height: 1px;
+}
+
+.foot {
+  text-align: center;
+  color: var(--on-surface-var);
+  font-size: 12px;
+  padding: 26px 20px 44px;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ---- player overlay ---- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: #0e0d12;
+  animation: overlay-in 0.35s var(--spring);
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.player-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--sc);
+  border-bottom: 1px solid var(--outline-var);
+}
+
+.player-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.p-source {
+  --c: #888;
+  flex: none;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--on-surface);
+  padding: 6px 12px;
+  border-radius: var(--shape-full);
+  background: color-mix(in srgb, var(--c) 26%, var(--sc-low));
+}
+
+.p-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+/* M3 tonal buttons; corners morph square-ish on press */
+.pbtn {
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--shape-full);
+  background: var(--secondary-c);
+  color: var(--on-secondary-c);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.25s var(--spring),
+    border-radius 0.25s var(--spring);
+}
+
+.pbtn:hover {
+  filter: brightness(1.06);
+}
+
+.pbtn:active {
+  transform: scale(0.95);
+  border-radius: var(--shape-s);
+}
+
+.pbtn.outlined {
+  background: transparent;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+}
+
+.pbtn.close {
+  background: var(--error-c);
+  color: var(--on-error-c);
+}
+
+.frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #0e0d12;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --tile: 106px;
+  }
+  .topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .search-wrap {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .count {
+    display: none;
+  }
+  .p-title {
+    display: none;
+  }
+  .chips {
+    padding-top: 4px;
+  }
+}

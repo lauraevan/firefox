@@ -2,19 +2,18 @@
 // tweak (site name, CDN mirrors, which sources are enabled) lives here.
 
 export const SITE = {
-  name: "Quackade",
-  tagline: "the pond's arcade",
-  // Shown when no cover art is available; a neutral game-controller glyph.
+  name: "Expo",
+  tagline: "the everything arcade",
+  // Shown when no cover art is available; a neutral game-controller glyph in
+  // mid tones that read on both the light and dark M3 surfaces.
   fallbackIcon:
     "data:image/svg+xml;utf8," +
     encodeURIComponent(
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-        <rect width="24" height="24" rx="5" fill="#1b2130"/>
-        <path d="M7.5 9.5h9a3.5 3.5 0 0 1 3.44 2.86l.53 2.9A2.4 2.4 0 0 1 18.1 18c-.7 0-1.36-.3-1.82-.83L15 15.7a1.5 1.5 0 0 0-1.13-.5h-3.74A1.5 1.5 0 0 0 9 15.7l-1.28 1.47A2.43 2.43 0 0 1 5.9 18a2.4 2.4 0 0 1-2.37-2.74l.53-2.9A3.5 3.5 0 0 1 7.5 9.5Z" fill="#2b3446" stroke="#4b5875" stroke-width="1"/>
-        <circle cx="9" cy="12.6" r="0.5" fill="#ffd34d"/>
-        <path d="M8 11.4v2.4M6.8 12.6h2.4" stroke="#ffd34d" stroke-width="1.1" stroke-linecap="round"/>
-        <circle cx="15.4" cy="11.9" r="0.9" fill="#ffd34d"/>
-        <circle cx="17.1" cy="13.6" r="0.9" fill="#7bd88f"/>
+        <path d="M7.5 9.5h9a3.5 3.5 0 0 1 3.44 2.86l.53 2.9A2.4 2.4 0 0 1 18.1 18c-.7 0-1.36-.3-1.82-.83L15 15.7a1.5 1.5 0 0 0-1.13-.5h-3.74A1.5 1.5 0 0 0 9 15.7l-1.28 1.47A2.43 2.43 0 0 1 5.9 18a2.4 2.4 0 0 1-2.37-2.74l.53-2.9A3.5 3.5 0 0 1 7.5 9.5Z" fill="#8F8699" fill-opacity="0.45" stroke="#79747E" stroke-width="1.2"/>
+        <path d="M8 11.4v2.4M6.8 12.6h2.4" stroke="#6750A4" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="15.4" cy="11.9" r="0.95" fill="#6750A4"/>
+        <circle cx="17.1" cy="13.6" r="0.95" fill="#7D5260"/>
       </svg>`
     ),
 };
