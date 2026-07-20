@@ -53,6 +53,10 @@ so the site runs from it with no build step:
 - Production (permanent CDN cache — pin a commit hash, not a branch):
   `https://rawcdn.githack.com/<owner>/<repo>/<commit-sha>/expo/index.html`
 
+Live deployment for this repo (tracks this branch):
+
+https://raw.githack.com/lauraevan/firefox/claude/duck-math-game-catalog-vxb4wc/expo/index.html
+
 ### A note on mirrors
 
 Game HTML is embedded from jsDelivr (with a Fastly mirror as a fallback you can
