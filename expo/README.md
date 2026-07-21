@@ -57,13 +57,17 @@ Live deployment for this repo (tracks this branch):
 
 https://raw.githack.com/lauraevan/firefox/claude/duck-math-game-catalog-vxb4wc/expo/index.html
 
-### A note on mirrors
+### How games are embedded
 
-Game HTML is embedded from jsDelivr (with a Fastly mirror as a fallback you can
-switch to with the **Mirror** button in the player). `raw.githubusercontent.com`
-is intentionally **not** used for game frames because it serves HTML as
-`text/plain`, which would show source code instead of the game; it is only used
-as a last-resort fallback for cover images.
+The raw-file CDNs these catalogs live on (jsDelivr, Fastly, raw.githubusercontent)
+all serve `.html` as `text/plain`, so a plain `<iframe src>` would show source
+code instead of the game. The player instead **fetches the game HTML as text,
+injects a `<base>` tag pointing at the file's CDN directory** (so the game's
+relative assets still resolve — non-HTML assets get correct content-types), and
+renders it through `iframe.srcdoc`. If a mirror fails, the player automatically
+advances to the next one (cdn.jsdelivr → Fastly → raw); the **Mirror** button
+cycles them manually. Games hosted on real sites (Truffled) embed directly.
+"Open" pops injected games into a new tab via a Blob URL.
 
 ## Configuration
 

@@ -228,6 +228,17 @@ export function parseTruffled(text) {
 // Ultimate Game Stash doc is not publicly exportable, so this seed is meant to
 // be extended by pasting in entries. Each entry: { title, url, img? }.
 // ---------------------------------------------------------------------------
+// A jsDelivr or raw URL is expanded into the whole mirror set so UGS entries
+// get the same fallbacks as the other sources.
+function expandKnownCdn(url) {
+  const j = String(url).match(
+    /^https?:\/\/(?:cdn|originfastly|fastly|gcore)\.jsdelivr\.net\/gh\/([^/@]+)\/([^/@]+)@([^/]+)\/(.+)$/
+  );
+  if (j) return expand(MIRRORS.embed, ghLocator(j[1], j[2], j[3], decodeURIComponent(j[4])));
+  const r = rawToLocatorParts(url);
+  if (r) return expand(MIRRORS.embed, ghLocator(r.owner, r.repo, r.ref, decodeURIComponent(r.path)));
+  return [url];
+}
 async function loadUgs() {
   const res = await fetch("data/ugs-games.json");
   if (!res.ok) throw new Error(`UGS list HTTP ${res.status}`);
@@ -238,7 +249,7 @@ async function loadUgs() {
     source: "ugs",
     sourceLabel: "UGS",
     img: g.img ? (Array.isArray(g.img) ? g.img : [g.img]) : [],
-    embed: g.url ? [g.url] : null,
+    embed: g.url ? expandKnownCdn(g.url) : null,
     external: g.external || undefined,
   }));
 }

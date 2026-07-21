@@ -1,5 +1,6 @@
 import { SITE, SOURCES } from "./config.js";
 import { PROVIDERS } from "./providers.js";
+import { needsInject, withBase } from "./embed.js";
 
 const BATCH = 48; // tiles rendered per infinite-scroll step
 
@@ -214,7 +215,10 @@ function wireInfiniteScroll() {
 }
 
 // --- player overlay -------------------------------------------------------
-const player = { candidates: [], idx: 0, game: null };
+// CDN-hosted games are fetched as text and rendered via iframe.srcdoc (see
+// embed.js for why); real hosts (e.g. truffled.lol) load via iframe.src.
+// `seq` guards against a slow fetch landing after the user switched games.
+const player = { candidates: [], idx: 0, game: null, html: null, blobUrl: null, seq: 0 };
 
 function wirePlayer() {
   els.overlay = document.getElementById("overlay");
@@ -222,20 +226,16 @@ function wirePlayer() {
   els.pTitle = document.getElementById("p-title");
   els.pSource = document.getElementById("p-source");
   els.pMirror = document.getElementById("p-mirror");
+  els.pLoading = document.getElementById("p-loading");
 
   document.getElementById("p-close").addEventListener("click", closeGame);
-  document.getElementById("p-new").addEventListener("click", () => {
-    const url = player.candidates[player.idx];
-    if (url) window.open(url, "_blank", "noopener");
-  });
+  document.getElementById("p-new").addEventListener("click", openExternalTab);
   document.getElementById("p-full").addEventListener("click", () => {
     if (els.frame.requestFullscreen) els.frame.requestFullscreen();
   });
   els.pMirror.addEventListener("click", () => {
     if (player.candidates.length < 2) return;
-    player.idx = (player.idx + 1) % player.candidates.length;
-    els.frame.src = player.candidates[player.idx];
-    updateMirrorLabel();
+    loadCandidate((player.idx + 1) % player.candidates.length);
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !els.overlay.hidden) closeGame();
@@ -247,6 +247,63 @@ function updateMirrorLabel() {
   els.pMirror.textContent = `Mirror ${player.idx + 1}/${player.candidates.length}`;
 }
 
+function clearFrame() {
+  els.frame.removeAttribute("src");
+  els.frame.removeAttribute("srcdoc");
+}
+
+// Try candidates starting at `start`; CDN URLs are fetched and injected, and a
+// failed fetch auto-advances to the next mirror.
+async function loadCandidate(start) {
+  const seq = ++player.seq;
+  const n = player.candidates.length;
+  for (let step = 0; step < n; step++) {
+    const i = (start + step) % n;
+    const url = player.candidates[i];
+    player.idx = i;
+    updateMirrorLabel();
+
+    if (!needsInject(url)) {
+      player.html = null;
+      clearFrame();
+      els.frame.src = url;
+      els.pLoading.hidden = true;
+      return;
+    }
+
+    try {
+      els.pLoading.hidden = false;
+      clearFrame();
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const html = withBase(await res.text(), url);
+      if (seq !== player.seq) return;
+      player.html = html;
+      els.frame.srcdoc = html;
+      els.pLoading.hidden = true;
+      return;
+    } catch (err) {
+      if (seq !== player.seq) return;
+      console.warn(`mirror failed: ${url}`, err);
+    }
+  }
+  els.pLoading.hidden = true;
+  player.html = null;
+  clearFrame();
+  els.frame.srcdoc = `<style>body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#0e0d12;color:#cac4d0;font:15px system-ui;text-align:center}</style><p>Couldn't load this game from any mirror.<br>Check your connection or try again later.</p>`;
+}
+
+function openExternalTab() {
+  if (player.html) {
+    if (player.blobUrl) URL.revokeObjectURL(player.blobUrl);
+    player.blobUrl = URL.createObjectURL(new Blob([player.html], { type: "text/html" }));
+    window.open(player.blobUrl, "_blank");
+  } else {
+    const url = player.candidates[player.idx];
+    if (url) window.open(url, "_blank", "noopener");
+  }
+}
+
 function openGame(game) {
   const src = SOURCES.find((s) => s.id === game.source);
   if ((!game.embed || game.embed.length === 0) && game.external) {
@@ -255,19 +312,24 @@ function openGame(game) {
   }
   player.game = game;
   player.candidates = game.embed || (game.external ? [game.external] : []);
-  player.idx = 0;
   els.pTitle.textContent = game.title;
   els.pSource.textContent = src ? src.label : "";
   els.pSource.style.setProperty("--c", src ? src.color : "#888");
-  els.frame.src = player.candidates[0] || "about:blank";
-  updateMirrorLabel();
   els.overlay.hidden = false;
   document.body.classList.add("locked");
+  loadCandidate(0);
 }
 
 function closeGame() {
+  player.seq++;
+  player.html = null;
+  if (player.blobUrl) {
+    URL.revokeObjectURL(player.blobUrl);
+    player.blobUrl = null;
+  }
   els.overlay.hidden = true;
-  els.frame.src = "about:blank";
+  els.pLoading.hidden = true;
+  clearFrame();
   document.body.classList.remove("locked");
 }
 

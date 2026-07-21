@@ -19,14 +19,17 @@ export const SITE = {
 };
 
 // Ordered CDN mirrors. jsDelivr and Fastly serve GitHub files with correct
-// content-types (so game HTML renders inside an iframe); raw.githubusercontent
-// serves HTML as text/plain, so it is only ever used as an *image* fallback,
-// never for a game frame.
+// content-types for assets; every one of them serves .html as text/plain,
+// which is fine: the player fetches game HTML as text and renders it via
+// iframe.srcdoc (see embed.js), so content-type never matters for game
+// frames. raw comes last because it is slower, but it has no file-size cap,
+// so it catches big games that jsDelivr refuses to serve.
 export const MIRRORS = {
   // {u} is replaced by "gh/<owner>/<repo>@<ref>/<path>"
   embed: [
     "https://cdn.jsdelivr.net/{u}",
     "https://originfastly.jsdelivr.net/{u}",
+    "https://raw.githubusercontent.com/{r}",
   ],
   image: [
     "https://cdn.jsdelivr.net/{u}",
