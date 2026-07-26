@@ -17,9 +17,9 @@ window.PTerm = window.PTerm || {};
 
   function setupEnv() {
     PT.env = {
-      version: "1.0.0",
+      version: "1.1.0",
       codename: "Portal",
-      build: buildHash("PTerm-1.0.0-Portal"),
+      build: buildHash("PTerm-1.1.0-Portal"),
       user: "guest",
       host: "pterm",
       shell: "psh",

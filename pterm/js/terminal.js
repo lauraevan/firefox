@@ -302,7 +302,8 @@ window.PTerm = window.PTerm || {};
 
       // game name completion for game-aware commands
       const cmd = (tokens[0] || "").toLowerCase();
-      const gameAware = ["npm", "play", "open", "launch", "search", "s", "info", "show", "install"];
+      const gameAware = ["npm", "play", "open", "launch", "search", "s", "info", "show",
+        "install", "fav", "favorite", "star", "unfav"];
       if (gameAware.indexOf(cmd) >= 0 && PT.catalog.all().length) {
         const p = wordRaw.replace(/^["']|["']$/g, "").toLowerCase();
         if (!p) return;

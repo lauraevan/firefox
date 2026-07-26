@@ -88,6 +88,15 @@ window.PTerm = window.PTerm || {};
     return /^(https?:)?\/\//i.test(s) || /^data:/i.test(s);
   };
 
+  /* Join base + relative path, percent-encoding the path (handles spaces in names). */
+  util.joinUrlEncoded = function (base, path) {
+    if (path == null || path === "") return base || "";
+    if (util.isAbsUrl(path)) return path;
+    const p = String(path).replace(/^\/+/, "");
+    if (!base) return encodeURI(p);
+    return base.replace(/\/+$/, "") + "/" + encodeURI(p);
+  };
+
   util.slug = function (s) {
     return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   };

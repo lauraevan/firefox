@@ -8,51 +8,78 @@ window.PTerm = window.PTerm || {};
   const CACHE_TTL = 6 * 60 * 60 * 1000; // 6h
 
   /* Source registry. Each visitor's browser fetches these directly (CORS-enabled
-     CDNs), so nothing is bundled at build time. Adding a source = adding an entry. */
+     CDNs), so nothing is bundled at build time. Adding a source = adding an entry.
+     Formats confirmed against each project's real catalog files. */
   const SOURCES = [
     {
+      // zones.json: [{ id, name, cover:"{COVER_URL}/4.png", url:"{HTML_URL}/4.html" }]
+      // Placeholder tokens are substituted below. Original freebuisness fork is
+      // gone; gn-math is the upstream and is what the tokens resolve to.
       key: "gn-math",
       label: "GN-Math",
-      aliases: ["gnmath", "gn", "gm", "gnm", "gn-math"],
+      aliases: ["gnmath", "gn", "gm", "gnm"],
       type: "json",
       catalogUrls: [
-        "https://cdn.jsdelivr.net/gh/freebuisness/assets@latest/zones.json",
-        "https://originfastly.jsdelivr.net/gh/freebuisness/assets@main/zones.json",
-        "https://raw.githubusercontent.com/freebuisness/assets/main/zones.json",
+        "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json",
+        "https://originfastly.jsdelivr.net/gh/gn-math/assets@main/zones.json",
+        "https://raw.githubusercontent.com/gn-math/assets/main/zones.json",
       ],
-      gameBase: "https://cdn.jsdelivr.net/gh/freebuisness/html@main",
-      gameBaseAlts: ["https://originfastly.jsdelivr.net/gh/freebuisness/html@main"],
-      coverBase: "https://cdn.jsdelivr.net/gh/freebuisness/covers@main",
-      idKind: "folder", // bare id -> id/index.html
+      placeholders: {
+        "{HTML_URL}": "https://cdn.jsdelivr.net/gh/gn-math/html@main",
+        "{COVER_URL}": "https://cdn.jsdelivr.net/gh/gn-math/covers@main",
+        "{ASSET_URL}": "https://cdn.jsdelivr.net/gh/gn-math/assets@main",
+      },
+      gameBase: "https://cdn.jsdelivr.net/gh/gn-math/html@main",
+      coverBase: "https://cdn.jsdelivr.net/gh/gn-math/covers@main",
+      idKind: "folder",
     },
     {
+      // cards-data.js: `export default [{ href:'./html/<name>/index.html',
+      // imgSrc:'<name>.jpg', name:'<name>', page }]` -- an ES module, so it must
+      // be text-parsed (a script tag can't expose a module's default export).
       key: "strongdog",
       label: "Strongdog XP",
       aliases: ["sd", "strongdog", "strongdogxp", "xp", "strong"],
       type: "js",
+      jsParse: "text",
       catalogUrls: [
         "https://cdn.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master/cards-data.js",
         "https://originfastly.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master/cards-data.js",
         "https://raw.githubusercontent.com/IAmNotTechnoblade/strongdogxp/master/cards-data.js",
       ],
       gameBase: "https://cdn.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master",
-      gameBaseAlts: ["https://originfastly.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master"],
       coverBase: "https://cdn.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master",
-      idKind: "path", // url is already a path
+      idKind: "path",
+    },
+    {
+      // public/js/json/g.json: { games:[{ name, url:"/games/<id>/index.html",
+      // thumbnail:"png/games/<id>.webp", frameType }] }. Web root is public/.
+      key: "truffled",
+      label: "Truffled",
+      aliases: ["tr", "truffle", "truf"],
+      type: "json",
+      catalogUrls: [
+        "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json",
+        "https://originfastly.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json",
+        "https://raw.githubusercontent.com/aukak/truffled/main/public/js/json/g.json",
+      ],
+      gameBase: "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public",
+      coverBase: "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public",
+      idKind: "path",
     },
   ];
 
   const state = {
     all: [],
-    bySource: {},   // key -> [games]
-    loaded: {},     // key -> true
-    error: {},      // key -> message
-    injected: {},   // url -> true (avoid re-declaring const globals)
+    bySource: {},
+    loaded: {},
+    error: {},
+    injected: {},
   };
 
   const NAME_KEYS = ["name", "title", "gameName", "label", "text", "alt"];
-  const URL_KEYS = ["url", "link", "href", "path", "game", "file", "src", "page", "id"];
-  const IMG_KEYS = ["image", "cover", "icon", "img", "thumbnail", "thumb", "banner", "logo"];
+  const URL_KEYS = ["url", "href", "link", "path", "game", "file", "src", "page", "id"];
+  const IMG_KEYS = ["cover", "image", "imgSrc", "imgsrc", "icon", "img", "thumbnail", "thumb", "banner", "logo"];
 
   function firstKey(obj, keys) {
     for (const k of keys) {
@@ -61,43 +88,51 @@ window.PTerm = window.PTerm || {};
     return null;
   }
 
-  function pathNoQuery(s) {
-    return String(s).split(/[?#]/)[0];
+  function subPlaceholders(s, source) {
+    if (!source.placeholders || s == null) return s;
+    let out = String(s);
+    for (const token in source.placeholders) {
+      if (out.indexOf(token) >= 0) out = out.split(token).join(source.placeholders[token]);
+    }
+    return out;
   }
 
   function resolveLaunch(raw, source) {
     if (raw == null) return null;
-    let url = String(raw).trim();
+    let url = subPlaceholders(String(raw).trim(), source);
     if (!url) return null;
     if (U.isAbsUrl(url)) return url;
-    url = url.replace(/^\/+/, "");
-    const p = pathNoQuery(url);
-    if (/\.(html?|php)$/i.test(p)) return U.joinUrl(source.gameBase, url);
-    if (source.idKind === "folder") return U.joinUrl(source.gameBase, url + "/index.html");
-    return U.joinUrl(source.gameBase, url);
+    url = url.replace(/^\.\//, "").replace(/^\/+/, "");
+    const p = url.split(/[?#]/)[0];
+    if (!/\.(html?|php)$/i.test(p) && source.idKind === "folder") {
+      url = url.replace(/\/+$/, "") + "/index.html";
+    }
+    return U.joinUrlEncoded(source.gameBase, url);
   }
 
   function resolveCover(raw, source) {
     if (raw == null || raw === "") return null;
-    const s = String(raw).trim();
+    let s = subPlaceholders(String(raw).trim(), source);
     if (U.isAbsUrl(s)) return s;
-    return U.joinUrl(source.coverBase, s.replace(/^\/+/, ""));
+    return U.joinUrlEncoded(source.coverBase, s.replace(/^\.\//, "").replace(/^\/+/, ""));
+  }
+
+  function isJunkEntry(name, launch, entry) {
+    if (entry && typeof entry === "object" && typeof entry.id === "number" && entry.id < 0) return true;
+    if (name && /^\s*\[!\]/.test(String(name))) return true;
+    if (launch && /discord\.(gg|com)/i.test(launch)) return true;
+    return false;
   }
 
   function normalizeEntry(entry, source, i) {
     if (entry == null) return null;
     if (typeof entry === "string") {
-      // bare string: treat as both name and folder/id
       const launch = resolveLaunch(entry, source);
-      if (!launch) return null;
+      if (!launch || isJunkEntry(entry, launch, null)) return null;
       return {
         id: source.key + ":" + U.slug(entry) + ":" + i,
-        name: entry,
-        source: source.key,
-        sourceLabel: source.label,
-        launchUrl: launch,
-        coverUrl: null,
-        raw: entry,
+        name: entry, source: source.key, sourceLabel: source.label,
+        launchUrl: launch, coverUrl: null, launchAlt: [], raw: entry,
       };
     }
     if (typeof entry !== "object") return null;
@@ -106,15 +141,14 @@ window.PTerm = window.PTerm || {};
     const imgRaw = firstKey(entry, IMG_KEYS);
     const launch = resolveLaunch(urlRaw, source);
     if (!name || !launch) return null;
+    if (isJunkEntry(name, launch, entry)) return null;
     return {
       id: source.key + ":" + U.slug(name) + ":" + i,
       name: String(name).trim(),
       source: source.key,
       sourceLabel: source.label,
       launchUrl: launch,
-      launchAlt: source.gameBaseAlts && urlRaw != null && !U.isAbsUrl(String(urlRaw))
-        ? source.gameBaseAlts.map((b) => resolveLaunch(urlRaw, Object.assign({}, source, { gameBase: b })))
-        : [],
+      launchAlt: [],
       coverUrl: resolveCover(imgRaw, source),
       raw: entry,
     };
@@ -123,14 +157,27 @@ window.PTerm = window.PTerm || {};
   function normalizeList(list, source) {
     const out = [];
     if (!Array.isArray(list)) return out;
+    const seen = Object.create(null);
     for (let i = 0; i < list.length; i++) {
       const g = normalizeEntry(list[i], source, i);
-      if (g) out.push(g);
+      if (!g) continue;
+      const key = g.launchUrl;
+      if (seen[key]) continue;
+      seen[key] = 1;
+      out.push(g);
     }
     return out;
   }
 
   /* ---- adapters ---- */
+
+  function unwrapArray(data) {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.games)) return data.games;
+    if (data && Array.isArray(data.zones)) return data.zones;
+    if (data && Array.isArray(data.data)) return data.data;
+    return data;
+  }
 
   async function loadJson(source) {
     const { text } = await U.fetchTextFallback(source.catalogUrls);
@@ -138,15 +185,10 @@ window.PTerm = window.PTerm || {};
     try {
       data = JSON.parse(text);
     } catch (e) {
-      // some catalogs wrap the array in an assignment; try to extract it
       data = extractArrayLiteral(text);
       if (!data) throw new Error("catalog is not valid JSON");
     }
-    if (!Array.isArray(data)) {
-      if (data && Array.isArray(data.games)) data = data.games;
-      else if (data && Array.isArray(data.zones)) data = data.zones;
-    }
-    return normalizeList(data, source);
+    return normalizeList(unwrapArray(data), source);
   }
 
   function injectScript(url) {
@@ -163,15 +205,14 @@ window.PTerm = window.PTerm || {};
 
   function probeGlobal(name) {
     try {
-      // Body runs in global scope; sees both `var`/window and lexical (const/let) globals.
       return new Function("try{return " + name + "}catch(e){return undefined}")();
     } catch (e) { return undefined; }
   }
 
   function looksLikeGameList(arr) {
     if (!Array.isArray(arr) || !arr.length) return false;
-    const sample = arr.slice(0, 5);
     let hits = 0;
+    const sample = arr.slice(0, 5);
     for (const it of sample) {
       if (typeof it === "string") { hits++; continue; }
       if (it && typeof it === "object" && (firstKey(it, NAME_KEYS) || firstKey(it, URL_KEYS))) hits++;
@@ -183,23 +224,26 @@ window.PTerm = window.PTerm || {};
     "data", "games", "gameData", "gamesData", "apps", "items", "list", "gameList"];
 
   async function loadJs(source) {
-    let best = null;
-    let lastErr = null;
+    // Module-style catalogs (export default [...]) can't be read via a script
+    // tag; parse the text directly.
+    if (source.jsParse === "text") {
+      const { text } = await U.fetchTextFallback(source.catalogUrls);
+      const arr = extractArrayLiteral(text);
+      if (!looksLikeGameList(arr)) throw new Error("could not parse game array from script");
+      return normalizeList(arr, source);
+    }
+
+    let best = null, lastErr = null;
     for (const url of source.catalogUrls) {
       try {
         const before = new Set(Object.keys(window));
-        if (!state.injected[url]) {
-          await injectScript(url);
-          state.injected[url] = true;
-        }
-        // 1) diff new window props (var / window.X = ...)
+        if (!state.injected[url]) { await injectScript(url); state.injected[url] = true; }
         for (const k of Object.keys(window)) {
           if (before.has(k)) continue;
           const v = window[k];
           const arr = Array.isArray(v) ? v : (v && Array.isArray(v.games) ? v.games : null);
           if (looksLikeGameList(arr)) { best = arr; break; }
         }
-        // 2) probe known names (catches const/let lexical globals)
         if (!best) {
           for (const name of KNOWN_GLOBALS) {
             const v = probeGlobal(name);
@@ -210,7 +254,6 @@ window.PTerm = window.PTerm || {};
         if (best) break;
       } catch (e) { lastErr = e; }
     }
-    // 3) last resort: fetch as text and extract an array literal
     if (!best) {
       try {
         const { text } = await U.fetchTextFallback(source.catalogUrls);
@@ -244,6 +287,15 @@ window.PTerm = window.PTerm || {};
     try { return JSON.parse(snippet); } catch (e) {}
     try { return new Function("return (" + snippet + ")")(); } catch (e) {}
     return null;
+  }
+
+  function rebuildAll() {
+    const all = [];
+    for (const s of SOURCES) {
+      const arr = state.bySource[s.key];
+      if (arr) all.push.apply(all, arr);
+    }
+    state.all = all;
   }
 
   /* ---- public API ---- */
@@ -287,7 +339,6 @@ window.PTerm = window.PTerm || {};
         games = source.type === "js" ? await loadJs(source) : await loadJson(source);
       } catch (e) {
         state.error[source.key] = (e && e.message) || String(e);
-        // fall back to any stale cache we may still have in memory
         if (state.bySource[source.key]) return state.bySource[source.key];
         throw e;
       }
@@ -319,6 +370,8 @@ window.PTerm = window.PTerm || {};
 
     all() { return state.all; },
 
+    byId(id) { return state.all.find((g) => g.id === id) || null; },
+
     forSource(key) {
       const s = this.resolveSource(key);
       return s ? state.bySource[s.key] || [] : [];
@@ -327,7 +380,7 @@ window.PTerm = window.PTerm || {};
     search(query, opts) {
       opts = opts || {};
       const q = String(query || "").toLowerCase();
-      let pool = opts.sourceKey ? this.forSource(opts.sourceKey) : state.all;
+      const pool = opts.sourceKey ? this.forSource(opts.sourceKey) : state.all;
       if (!q) return pool.slice(0, opts.limit || pool.length);
       const out = pool.filter((g) => g.name.toLowerCase().includes(q));
       out.sort((a, b) => {
@@ -338,7 +391,6 @@ window.PTerm = window.PTerm || {};
       return opts.limit ? out.slice(0, opts.limit) : out;
     },
 
-    /* Best-effort resolution of a name to a single game. */
     find(name, sourceKey) {
       const pool = sourceKey ? this.forSource(sourceKey) : state.all;
       const q = String(name || "").trim().toLowerCase();
@@ -359,19 +411,12 @@ window.PTerm = window.PTerm || {};
       const incl = pool.filter((g) => g.name.toLowerCase().includes(q));
       if (incl.length === 1) return { exact: incl[0], candidates: incl };
 
-      const cands = (starts.length ? starts : incl);
-      return { exact: null, candidates: cands };
+      return { exact: null, candidates: starts.length ? starts : incl };
     },
-  };
 
-  function rebuildAll() {
-    const all = [];
-    for (const s of SOURCES) {
-      const arr = state.bySource[s.key];
-      if (arr) all.push.apply(all, arr);
-    }
-    state.all = all;
-  }
+    // exposed for offline parser tests
+    _debug: { normalizeList, extractArrayLiteral, resolveLaunch, resolveCover, subPlaceholders, unwrapArray },
+  };
 
   PT.catalog = catalog;
 })(window.PTerm);

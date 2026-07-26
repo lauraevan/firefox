@@ -696,6 +696,263 @@ window.PTerm = window.PTerm || {};
       ctx.println("there is no exit from PTerm. only more games. try " + '<span class="c-accent">ls</span>' + ".");
     } });
 
+  register({
+    name: "stats",
+    aliases: ["count"],
+    group: "games",
+    usage: "stats",
+    desc: "library totals per source.",
+    async run(ctx) {
+      await ensureLoaded(ctx);
+      let total = 0;
+      ctx.println('<span class="c-accent b">library stats</span>');
+      for (const s of PT.catalog.SOURCES) {
+        const n = (PT.catalog.state.bySource[s.key] || []).length;
+        total += n;
+        const err = PT.catalog.state.error[s.key];
+        ctx.println("  " + s.label.padEnd(14) + ' <span class="c-accent">' + String(n).padStart(5) +
+          "</span>" + (err ? ' <span class="c-error">(error)</span>' : ""));
+      }
+      ctx.println("  " + "TOTAL".padEnd(14) + ' <span class="c-accent b">' + String(total).padStart(5) + "</span> games");
+    },
+  });
+
+  function getFavs() { return U.store.get("favorites") || []; }
+  function setFavs(f) { U.store.set("favorites", f); }
+
+  register({
+    name: "fav",
+    aliases: ["favorite", "star"],
+    group: "games",
+    usage: 'fav "<Game>" [S=source]',
+    desc: "star a game for quick access.",
+    async run(ctx, args, flags) {
+      const srcFlag = flags.s || flags.source;
+      const name = args.filter((a) => a !== srcFlag)[0];
+      if (!name) { ctx.printError('usage: fav "&lt;Game&gt;"'); return; }
+      await ensureLoaded(ctx, srcFlag);
+      const { exact, candidates } = PT.catalog.find(name, srcFlag);
+      const g = exact || (candidates.length === 1 ? candidates[0] : null);
+      if (!g) {
+        if (candidates.length > 1) { ctx.printWarn("be more specific:"); ctx.printBlock(renderList(candidates, { limit: 20, showSource: true })); }
+        else ctx.printError('no game named "' + U.esc(name) + '".');
+        return;
+      }
+      const favs = getFavs();
+      if (favs.some((f) => f.id === g.id)) { ctx.println('<span class="c-dim">already starred:</span> ' + U.esc(g.name)); return; }
+      favs.push({ id: g.id, name: g.name, source: g.source });
+      setFavs(favs);
+      ctx.println('<span class="c-warn">*</span> starred ' + U.esc(g.name) + ' <span class="c-dim">(' + favs.length + " total)</span>");
+    },
+  });
+
+  register({
+    name: "unfav",
+    aliases: ["unstar"],
+    group: "games",
+    usage: 'unfav "<Game>"',
+    desc: "remove a star.",
+    async run(ctx, args) {
+      const name = args[0];
+      if (!name) { ctx.printError('usage: unfav "&lt;Game&gt;"'); return; }
+      let favs = getFavs();
+      const before = favs.length;
+      const q = name.toLowerCase();
+      favs = favs.filter((f) => f.name.toLowerCase() !== q);
+      setFavs(favs);
+      ctx.println(before === favs.length
+        ? '<span class="c-dim">not in favorites: ' + U.esc(name) + "</span>"
+        : "removed " + U.esc(name) + " from favorites");
+    },
+  });
+
+  register({
+    name: "favorites",
+    aliases: ["favs", "stars"],
+    group: "games",
+    usage: "favorites",
+    desc: "list your starred games.",
+    async run(ctx) {
+      const favs = getFavs();
+      if (!favs.length) {
+        ctx.println('<span class="c-dim">no favorites yet. star one with</span> <span class="c-accent">fav "&lt;Game&gt;"</span>');
+        return;
+      }
+      ctx.println('<span class="c-accent b">favorites</span>');
+      favs.forEach((f, i) => {
+        ctx.println('  <span class="c-warn">*</span> ' + String(i + 1).padStart(2) + "  " +
+          '<a class="c-link" data-game-id="' + U.esc(f.id) + '">' + U.esc(f.name) + "</a> " +
+          '<span class="c-mute">[' + U.esc(f.source) + "]</span>");
+      });
+    },
+  });
+
+  register({ name: "fortune", group: "fun", usage: "fortune", desc: "a fortune cookie.",
+    async run(ctx) { ctx.println(U.esc(U.pick(FORTUNES))); } });
+
+  register({ name: "cowsay", group: "fun", usage: "cowsay <text>", desc: "the cow has opinions.",
+    async run(ctx, args, flags, raw) {
+      const t = raw.replace(/^cowsay\s?/, "") || "moo";
+      ctx.printBlock('<span class="pt-logo">' + U.esc(cowsay(t)) + "</span>");
+    } });
+
+  register({ name: "calc", aliases: ["bc"], group: "fun", usage: "calc <expr>", desc: "a tiny calculator.",
+    async run(ctx, args, flags, raw) {
+      const expr = raw.replace(/^(calc|bc)\s?/, "").trim();
+      if (!expr) { ctx.printError("usage: calc &lt;expression&gt;"); return; }
+      if (!/^[-+*/%().\s\d]+$/.test(expr)) { ctx.printError("only numbers and + - * / % ( ) allowed"); return; }
+      try { ctx.println(String(Function("return (" + expr + ")")())); }
+      catch (e) { ctx.printError("could not evaluate that."); }
+    } });
+
+  register({ name: "roll", aliases: ["dice"], group: "fun", usage: "roll [NdM]", desc: "roll dice, e.g. roll 2d6.",
+    async run(ctx, args) {
+      const m = (args[0] || "1d6").match(/^(\d*)d(\d+)$/i);
+      if (!m) { ctx.printError("usage: roll NdM (e.g. 2d6)"); return; }
+      const n = Math.min(100, parseInt(m[1] || "1", 10) || 1);
+      const faces = Math.min(1000, parseInt(m[2], 10));
+      if (!faces) { ctx.printError("those dice have no faces."); return; }
+      const rolls = []; let sum = 0;
+      for (let i = 0; i < n; i++) { const r = 1 + U.randInt(faces); rolls.push(r); sum += r; }
+      ctx.println(rolls.join(" + ") + '  ->  <span class="c-accent b">' + sum + "</span>");
+    } });
+
+  register({ name: "flip", aliases: ["coin"], group: "fun", usage: "flip", desc: "flip a coin.",
+    async run(ctx) { ctx.println('<span class="c-accent">' + (Math.random() < 0.5 ? "heads" : "tails") + "</span>"); } });
+
+  register({ name: "ping", group: "fun", usage: "ping <host>", desc: "pretend to ping a host.",
+    async run(ctx, args) {
+      const host = args[0] || "portal.pterm";
+      ctx.println("PING " + U.esc(host) + " (127.0.0.1): 56 data bytes");
+      for (let i = 0; i < 4; i++) {
+        await U.sleep(280);
+        ctx.println("64 bytes from " + U.esc(host) + ": icmp_seq=" + i + " ttl=64 time=" + (0.1 + Math.random() * 9).toFixed(3) + " ms");
+      }
+      ctx.println("--- " + U.esc(host) + " ping statistics ---");
+      ctx.println("4 packets transmitted, 4 received, 0% packet loss");
+    } });
+
+  register({ name: "top", aliases: ["ps", "htop"], group: "fun", usage: "top", desc: "list running processes.",
+    async run(ctx) {
+      ctx.println('<span class="c-dim">  PID USER      %CPU %MEM  COMMAND</span>');
+      const procs = [
+        ["1", "root", "0.0", "0.1", "/sbin/portal-init"],
+        ["7", "guest", "0.3", "0.4", "psh"],
+        ["42", "guest", "1.2", "2.1", "gamed --catalogs=" + PT.catalog.SOURCES.length],
+        ["108", "guest", "0.7", "1.4", "portald --overlay"],
+        ["256", "guest", (Math.random() * 20).toFixed(1), "3.3", "fastfetch"],
+        ["777", "guest", "0.0", "0.2", "coffee-daemon"],
+      ];
+      procs.forEach((p) => ctx.println("  " + p[0].padStart(4) + " " + p[1].padEnd(9) + " " +
+        p[2].padStart(4) + " " + p[3].padStart(4) + "  " + U.esc(p[4])));
+    } });
+
+  register({ name: "weather", group: "fun", usage: "weather", desc: "today's forecast.",
+    async run(ctx) {
+      ctx.println('<span class="c-accent">portal:</span> cloudy with a 100% chance of games. ' +
+        "UV index: " + U.randInt(11) + ". you should be doing homework.");
+    } });
+
+  register({ name: "colors", aliases: ["palette", "colortest"], group: "fun", usage: "colors", desc: "show the theme palette.",
+    async run(ctx) {
+      const vars = [["fg", "--fg"], ["dim", "--fg-dim"], ["mute", "--fg-mute"], ["accent", "--accent"],
+        ["warn", "--warn"], ["error", "--error"], ["link", "--link"]];
+      ctx.printBlock(vars.map((v) => '<span style="color:var(' + v[1] + ')">&#9608;&#9608;&#9608; ' + v[0] + "</span>").join("   "));
+      ctx.println('<span class="c-dim">themes:</span> ' + THEMES.join(", ") + ' <span class="c-dim">// theme &lt;name&gt;</span>');
+    } });
+
+  register({ name: "matrix", group: "fun", usage: "matrix", desc: "follow the white rabbit. (any key exits)",
+    async run(ctx) {
+      ctx.println('<span class="c-dim">wake up...</span>');
+      await U.sleep(300);
+      await runMatrix();
+    } });
+
+  register({ name: "hack", group: "fun", usage: "hack [target]", desc: "h4ck the planet.",
+    async run(ctx, args) {
+      const tgt = args[0] || "the-mainframe";
+      const steps = ["establishing uplink to " + tgt, "bypassing firewall", "injecting payload",
+        "cracking sha-256", "escalating privileges", "exfiltrating cat pictures"];
+      for (const s of steps) {
+        ctx.print("  " + U.esc(s) + " ");
+        for (let i = 0; i < 10; i++) { await U.sleep(35); ctx.appendToLast('<span class="c-ok">#</span>'); }
+        ctx.appendToLast(' <span class="c-accent">ok</span>');
+      }
+      await U.sleep(200);
+      ctx.println('<span class="c-warn b">ACCESS GRANTED</span> <span class="c-dim">(kidding. this is just PTerm.)</span>');
+    } });
+
+  const FORTUNES = [
+    "you will play one more game before you finish that assignment.",
+    "the best time to touch grass was 20 minutes ago. the second best time is never.",
+    "a wise gamer once said: S=GN-Math.",
+    "your high score is safe. no one is coming.",
+    "404: motivation not found.",
+    "he who types npm start shall receive.",
+    "the cake is a lie, but the games are real.",
+    "you miss 100% of the games you don't launch.",
+    "somewhere, a teacher is refreshing the network logs. play faster.",
+    "loading... loading... have you tried `random`?",
+  ];
+
+  function cowsay(text) {
+    const t = String(text);
+    const top = " " + "_".repeat(t.length + 2);
+    const bot = " " + "-".repeat(t.length + 2);
+    return [top, "< " + t + " >", bot,
+      "        \\   ^__^",
+      "         \\  (oo)\\_______",
+      "            (__)\\       )\\/\\",
+      "                ||----w |",
+      "                ||     ||"].join("\n");
+  }
+
+  /* Full-screen matrix rain; resolves on any key/click (or after a safety timeout). */
+  function runMatrix() {
+    return new Promise((resolve) => {
+      const cv = document.createElement("canvas");
+      cv.style.cssText = "position:fixed;inset:0;z-index:60;background:#000;";
+      document.body.appendChild(cv);
+      const g = cv.getContext("2d");
+      const fontSize = 14;
+      let drops = [];
+      function size() {
+        cv.width = window.innerWidth; cv.height = window.innerHeight;
+        const cols = Math.ceil(cv.width / fontSize);
+        drops = new Array(cols).fill(0).map(() => Math.floor(Math.random() * cv.height / fontSize));
+      }
+      size();
+      const chars = "アイウエオ0123456789ABCDEF$+*<>=".split("");
+      let raf;
+      function draw() {
+        g.fillStyle = "rgba(0,0,0,0.07)";
+        g.fillRect(0, 0, cv.width, cv.height);
+        g.fillStyle = "#22ff44";
+        g.font = fontSize + "px monospace";
+        for (let i = 0; i < drops.length; i++) {
+          g.fillText(chars[Math.floor(Math.random() * chars.length)], i * fontSize, drops[i] * fontSize);
+          if (drops[i] * fontSize > cv.height && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+        raf = requestAnimationFrame(draw);
+      }
+      draw();
+      function done() {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("keydown", done, true);
+        window.removeEventListener("mousedown", done, true);
+        window.removeEventListener("resize", size);
+        clearTimeout(safety);
+        cv.remove();
+        resolve();
+      }
+      const safety = setTimeout(done, 30000);
+      window.addEventListener("keydown", done, true);
+      window.addEventListener("mousedown", done, true);
+      window.addEventListener("resize", size);
+    });
+  }
+
   const commands = {
     registry,
     register,
