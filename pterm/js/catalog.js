@@ -19,10 +19,9 @@ window.PTerm = window.PTerm || {};
       label: "GN-Math",
       aliases: ["gnmath", "gn", "gm", "gnm"],
       type: "json",
-      // local snapshot first (same origin as the deploy, so it can't be blocked
-      // separately from the page); CDNs are refresh fallbacks.
+      // Primary data is the embedded snapshot (js/catalogs.js); these CDN mirrors
+      // are only used on an explicit `sync` refresh.
       catalogUrls: [
-        "data/gn-math.zones.json",
         "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json",
         "https://fastly.jsdelivr.net/gh/gn-math/assets@main/zones.json",
         "https://raw.githubusercontent.com/gn-math/assets/main/zones.json",
@@ -46,7 +45,6 @@ window.PTerm = window.PTerm || {};
       type: "js",
       jsParse: "text",
       catalogUrls: [
-        "data/strongdog.cards.js",
         "https://cdn.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master/cards-data.js",
         "https://fastly.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master/cards-data.js",
         "https://raw.githubusercontent.com/IAmNotTechnoblade/strongdogxp/master/cards-data.js",
@@ -63,7 +61,6 @@ window.PTerm = window.PTerm || {};
       aliases: ["tr", "truffle", "truf"],
       type: "json",
       catalogUrls: [
-        "data/truffled.g.json",
         "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json",
         "https://fastly.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json",
         "https://raw.githubusercontent.com/aukak/truffled/main/public/js/json/g.json",
@@ -219,6 +216,14 @@ window.PTerm = window.PTerm || {};
     return data;
   }
 
+  /* Normalize from the embedded snapshot (window.PTerm.DATA), no network. */
+  function fromEmbedded(source) {
+    const D = PT.DATA;
+    if (!D || !D[source.key]) return null;
+    try { return normalizeList(unwrapArray(D[source.key]), source); }
+    catch (e) { return null; }
+  }
+
   async function loadJson(source) {
     const { text } = await U.fetchTextFallback(source.catalogUrls);
     let data;
@@ -361,32 +366,33 @@ window.PTerm = window.PTerm || {};
       opts = opts || {};
       const source = typeof sourceKey === "object" ? sourceKey : this.resolveSource(sourceKey);
       if (!source) throw new Error("unknown source: " + sourceKey);
-      const cacheKey = "cat:" + source.key;
 
-      if (!opts.force) {
-        if (state.loaded[source.key]) return state.bySource[source.key];
-        const cached = U.store.get(cacheKey);
-        if (cached && cached.length) {
-          state.bySource[source.key] = cached;
-          state.loaded[source.key] = true;
-          rebuildAll();
-          return cached;
+      if (!opts.force && state.loaded[source.key]) return state.bySource[source.key];
+
+      let games = null;
+
+      // 1) embedded snapshot (js/catalogs.js) -- loads with the page, no network,
+      //    so sources work even when every CDN and relative path is blocked.
+      if (!opts.force) games = fromEmbedded(source);
+
+      // 2) network (explicit refresh, or embedded missing); embedded is the fallback
+      if (!games || !games.length) {
+        try {
+          games = source.type === "js" ? await loadJs(source) : await loadJson(source);
+        } catch (e) {
+          const fb = fromEmbedded(source);
+          if (fb && fb.length) games = fb;
+          else {
+            state.error[source.key] = (e && e.message) || String(e);
+            if (state.bySource[source.key]) return state.bySource[source.key];
+            throw e;
+          }
         }
-      }
-
-      let games;
-      try {
-        games = source.type === "js" ? await loadJs(source) : await loadJson(source);
-      } catch (e) {
-        state.error[source.key] = (e && e.message) || String(e);
-        if (state.bySource[source.key]) return state.bySource[source.key];
-        throw e;
       }
 
       state.bySource[source.key] = games;
       state.loaded[source.key] = true;
       delete state.error[source.key];
-      U.store.set(cacheKey, games, CACHE_TTL);
       rebuildAll();
       return games;
     },

@@ -940,6 +940,10 @@ window.PTerm = window.PTerm || {};
       ctx.println('<span class="c-accent b">connectivity check</span>');
       for (const s of PT.catalog.SOURCES) {
         ctx.println('<span class="c-dim">' + U.esc(s.label) + "</span>");
+        const emb = PT.DATA && PT.DATA[s.key];
+        const embN = Array.isArray(emb) ? emb.length : (emb && emb.games ? emb.games.length : null);
+        ctx.println("  embedded snapshot ......... " +
+          (emb ? '<span class="c-ok">ok (' + embN + " games)</span>" : '<span class="c-error">missing</span>'));
         for (const url of s.catalogUrls) {
           ctx.print("  " + U.esc(url.length > 62 ? url.slice(0, 59) + "..." : url) + " ... ");
           ctx.appendToLast(await probe(url));
@@ -952,8 +956,8 @@ window.PTerm = window.PTerm || {};
         ctx.appendToLast(await probe(g.launchUrl));
       }
       ctx.println("");
-      ctx.println('<span class="c-dim">if the local</span> <span class="c-accent">data/...</span> <span class="c-dim">rows are ok but remote CDNs are blocked,</span>');
-      ctx.println('<span class="c-dim">your network is filtering the CDNs -- catalogs still load from the bundled copy.</span>');
+      ctx.println('<span class="c-dim">the embedded snapshot loads with the page, so sources work even when</span>');
+      ctx.println('<span class="c-dim">every CDN is blocked. blocked CDNs only affect launching the actual games.</span>');
     } });
 
   register({ name: "rev", group: "fun", usage: "rev <text>", desc: "reverse text.",

@@ -79,20 +79,21 @@ Input niceties: **Tab** completes commands, source flags (`S=`), and game names;
 **Up/Down** walk history; **Ctrl+L** clears; **Ctrl+C** cancels the line; games in
 listings are clickable. Inside a game, **Esc** or **Ctrl+Q** quits back to the shell.
 
-## Catalogs are bundled (why sources always load)
+## Catalogs are embedded (why sources always load)
 
-The three catalogs are committed as a snapshot under [`data/`](data/) (GN-Math
-`zones.json`, Strongdog `cards-data.js`, Truffled `g.json`). PTerm loads them from
-there **first** — same origin as the deployed page, so they can't be blocked
-separately from the site. The live CDNs are only used as refresh fallbacks. This is
-why "all sources error" is fixed even on networks that block jsDelivr / GitHub:
-run `diag` to see local (`data/…`) vs remote reachability. To refresh the snapshot,
-re-download those files from the source repos and commit them (~340 KB total).
+The three catalogs are committed as a snapshot in [`js/catalogs.js`](js/catalogs.js)
+(`window.PTerm.DATA`), which is loaded with a plain `<script>` tag — the same way as
+every other `js/` file. So there is **no catalog fetch at all**: no relative path to
+404, no CORS, no CDN to block. If the page loads, the ~1955 games load. The live CDNs
+are only touched on an explicit `sync`. Run `diag` to see the embedded snapshot status
+vs remote CDN reachability. To refresh the snapshot, re-download the source catalogs
+and regenerate `js/catalogs.js`.
 
 Note the **games themselves** still stream from CDNs (they're gigabytes — can't be
 bundled). If a network blocks every game CDN, games won't launch even though the
 catalog does; the launcher tries jsDelivr → originfastly → githack → statically per
-game to maximize the odds.
+game to maximize the odds. This mirrors how GN-Math/Truffled work — they serve games
+from their own (unblocked) domain; PTerm uses public CDNs instead.
 
 ## If a game doesn't load
 
@@ -174,8 +175,9 @@ pterm/
   css/pterm.css       # themes, CRT effect, layout
   js/
     util.js           # helpers: tokenizer, url join/encode, storage, fetch-fallback
-    ascii.js          # P logo + PTERM banner
-    catalog.js        # sources, adapters, normalization, search, caching
+    ascii.js          # P logo, PTERM banner, 14 distro logos for fastfetch
+    catalogs.js       # embedded catalog snapshot (window.PTerm.DATA) -- generated
+    catalog.js        # sources, adapters, normalization, search (embedded-first)
     launcher.js       # in-terminal iframe overlay (+ new-tab fallback)
     commands.js       # the command registry
     terminal.js       # input line, history, tab completion, dispatch
