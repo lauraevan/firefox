@@ -14,6 +14,7 @@ window.PTerm = window.PTerm || {};
     _draft: "",
     _busy: false,
     _lastLine: null,
+    _pending: null,
 
     init() {
       this.screen = document.getElementById("pt-screen");
@@ -110,6 +111,21 @@ window.PTerm = window.PTerm || {};
       this._scroll();
     },
 
+    /* Read one line of input (optionally masked). Resolves with the text, or ""
+       if the user hits Ctrl+C. Used by the login gate, passwd, su, etc. */
+    readLine(opts) {
+      opts = opts || {};
+      return new Promise((resolve) => {
+        this._pending = { resolve: resolve, mask: !!opts.mask };
+        this._busy = false;
+        this.promptEl.innerHTML = opts.prompt || "";
+        this.inputLine.hidden = false;
+        this._setBuffer("", 0);
+        this.focus();
+        this._scroll();
+      });
+    },
+
     hidePrompt() {
       this.inputLine.hidden = true;
     },
@@ -121,6 +137,10 @@ window.PTerm = window.PTerm || {};
     getHistory() { return this._history.slice(); },
 
     _render() {
+      if (this._pending && this._pending.mask) {
+        this.renderedEl.innerHTML = "*".repeat(this._buffer.length) + '<span class="pt-cursor"></span>';
+        return;
+      }
       const b = this._buffer;
       const pos = this._cursor;
       let html;
@@ -165,7 +185,7 @@ window.PTerm = window.PTerm || {};
       if (PT.launcher.isOpen()) return;
       const key = e.key;
 
-      if (this._busy) {
+      if (this._busy && !this._pending) {
         // allow Ctrl+C to at least drop a fresh line visually
         if ((e.ctrlKey || e.metaKey) && (key === "c" || key === "C")) e.preventDefault();
         return;
@@ -242,14 +262,24 @@ window.PTerm = window.PTerm || {};
     },
 
     _cancelLine() {
-      this._appendLine(this.promptHTML + U.esc(this._buffer) + '<span class="c-dim">^C</span>');
+      const masked = this._pending && this._pending.mask;
+      this._appendLine((this._pending ? this.promptEl.innerHTML : this.promptHTML) +
+        (masked ? "" : U.esc(this._buffer)) + '<span class="c-dim">^C</span>');
       this._setBuffer("", 0);
+      if (this._pending) {
+        const p = this._pending;
+        this._pending = null;
+        this.promptEl.innerHTML = this.promptHTML;
+        p.resolve("");
+        return;
+      }
       this._histIdx = this._history.length;
     },
 
     /* ---------- history ---------- */
 
     _historyPrev() {
+      if (this._pending) return;
       if (!this._history.length) return;
       if (this._histIdx === this._history.length) this._draft = this._buffer;
       this._histIdx = Math.max(0, this._histIdx - 1);
@@ -257,6 +287,7 @@ window.PTerm = window.PTerm || {};
     },
 
     _historyNext() {
+      if (this._pending) return;
       if (this._histIdx >= this._history.length) return;
       this._histIdx++;
       if (this._histIdx === this._history.length) this._setBuffer(this._draft || "");
@@ -277,6 +308,7 @@ window.PTerm = window.PTerm || {};
     /* ---------- completion ---------- */
 
     _complete() {
+      if (this._pending) return;
       const b = this._buffer.slice(0, this._cursor);
       const tokens = U.tokenize(b);
       const endsSpace = /\s$/.test(b);
@@ -364,6 +396,15 @@ window.PTerm = window.PTerm || {};
 
     _submit() {
       const line = this._buffer;
+      if (this._pending) {
+        const p = this._pending;
+        this._pending = null;
+        this._appendLine(this.promptEl.innerHTML + (p.mask ? "*".repeat(line.length) : U.esc(line)));
+        this._setBuffer("", 0);
+        this.promptEl.innerHTML = this.promptHTML;
+        p.resolve(line);
+        return;
+      }
       this._appendLine(this.promptHTML + U.esc(line));
       this._setBuffer("", 0);
       if (!line.trim()) { this._scroll(); return; }

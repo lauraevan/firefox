@@ -59,6 +59,27 @@ window.PTerm = window.PTerm || {};
       ctx.println('<span class="c-dim">        v' + PT.env.version + ' "' + PT.env.codename +
         '"  //  a terminal you have to earn</span>');
       ctx.println("");
+    },
+
+    async login(ctx) {
+      const stored = U.store.get("password");
+      const pass = stored == null ? "portal" : stored;
+      ctx.println('<span class="c-dim">portal secure shell -- authentication required</span>');
+      ctx.println("login: " + '<span class="c-accent">' + PT.env.user + "</span>");
+      if (stored == null) {
+        ctx.println('<span class="c-mute">(first run: the password is "portal" -- change it with </span>' +
+          '<span class="c-accent">passwd</span><span class="c-mute">)</span>');
+      }
+      for (;;) {
+        const entry = await ctx.readLine({ prompt: '<span class="c-dim">Password:</span> ', mask: true });
+        if (entry === pass) { ctx.println('<span class="c-ok">access granted.</span>'); await U.sleep(250); return; }
+        ctx.println('<span class="c-error">access denied.</span>');
+        await U.sleep(500);
+      }
+    },
+
+    welcome(ctx) {
+      ctx.println("");
       ctx.println('welcome to <span class="c-accent b">PTerm</span>. games are launched, not clicked.');
       ctx.println('<span class="c-dim">just type a game name to play it -- e.g.</span> <span class="c-accent">cookie clicker</span>');
       ctx.println('<span class="c-dim">or:</span> <span class="c-accent">ls</span> <span class="c-dim">browse .</span> ' +
@@ -68,6 +89,12 @@ window.PTerm = window.PTerm || {};
       ctx.println("");
     },
 
+    async replay(ctx) {
+      await this.sequence(ctx);
+      await this.login(ctx);
+      this.welcome(ctx);
+    },
+
     async start() {
       setupEnv();
       restorePrefs();
@@ -75,6 +102,8 @@ window.PTerm = window.PTerm || {};
       PT.terminal.init();
 
       await this.sequence(PT.terminal);
+      await this.login(PT.terminal);
+      this.welcome(PT.terminal);
       PT.terminal.showPrompt();
 
       // warm the catalogs in the background; commands also load on demand

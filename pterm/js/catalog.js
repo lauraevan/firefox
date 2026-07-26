@@ -117,6 +117,41 @@ window.PTerm = window.PTerm || {};
     return U.joinUrlEncoded(source.coverBase, s.replace(/^\.\//, "").replace(/^\/+/, ""));
   }
 
+  /* Same file, different CDN. Games get removed and CDNs rate-limit, so every
+     launch has fallbacks to try. */
+  function mirrorSwaps(url) {
+    const m = url.match(/^https?:\/\/(?:cdn|originfastly|fastly|gcore|testingcf)\.jsdelivr\.net\/gh\/([^@/]+)\/([^@/]+)@([^/]+)\/(.*)$/);
+    if (!m) return [];
+    const o = m[1], r = m[2], ref = m[3], path = m[4];
+    return [
+      "https://originfastly.jsdelivr.net/gh/" + o + "/" + r + "@" + ref + "/" + path,
+      "https://raw.githack.com/" + o + "/" + r + "/" + ref + "/" + path,
+      "https://cdn.statically.io/gh/" + o + "/" + r + "/" + ref + "/" + path,
+    ];
+  }
+
+  /* GN-Math games are either single-file (html/<id>.html) or multi-file
+     (assets/<id>/index.html); if the catalog's shape 404s, try the other one. */
+  function pathShapeAlts(url) {
+    let m;
+    if ((m = url.match(/^(https?:\/\/.*\/gh\/gn-math\/)html(@[^/]+)\/([^/?#]+)\.html(?:[?#].*)?$/)))
+      return [m[1] + "assets" + m[2] + "/" + m[3] + "/index.html"];
+    if ((m = url.match(/^(https?:\/\/.*\/gh\/gn-math\/)assets(@[^/]+)\/([^/?#]+)\/index\.html(?:[?#].*)?$/)))
+      return [m[1] + "html" + m[2] + "/" + m[3] + ".html"];
+    return [];
+  }
+
+  function buildAlts(launch) {
+    if (!launch) return [];
+    const out = [];
+    mirrorSwaps(launch).forEach((u) => out.push(u));
+    pathShapeAlts(launch).forEach((a) => { out.push(a); mirrorSwaps(a).forEach((u) => out.push(u)); });
+    const seen = Object.create(null);
+    const res = [];
+    for (const u of out) { if (u && u !== launch && !seen[u]) { seen[u] = 1; res.push(u); } }
+    return res;
+  }
+
   function isJunkEntry(name, launch, entry) {
     if (entry && typeof entry === "object" && typeof entry.id === "number" && entry.id < 0) return true;
     if (name && /^\s*\[!\]/.test(String(name))) return true;
@@ -132,7 +167,7 @@ window.PTerm = window.PTerm || {};
       return {
         id: source.key + ":" + U.slug(entry) + ":" + i,
         name: entry, source: source.key, sourceLabel: source.label,
-        launchUrl: launch, coverUrl: null, launchAlt: [], raw: entry,
+        launchUrl: launch, coverUrl: null, launchAlt: buildAlts(launch), raw: entry,
       };
     }
     if (typeof entry !== "object") return null;
@@ -148,7 +183,7 @@ window.PTerm = window.PTerm || {};
       source: source.key,
       sourceLabel: source.label,
       launchUrl: launch,
-      launchAlt: [],
+      launchAlt: buildAlts(launch),
       coverUrl: resolveCover(imgRaw, source),
       raw: entry,
     };

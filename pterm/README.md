@@ -14,6 +14,10 @@ ceremony? `play cookie clicker` and `npm start "Cookie Clicker" S=GN-Math` still
 work. PTerm starts in a clean black-and-white theme; `theme green` (or `amber`,
 `matrix`, `ice`) and `crt on` bring back the retro glow.
 
+**Login:** PTerm opens with a password gate. The first-run password is `portal`
+(the login screen says so). Change it with `passwd`, re-lock with `lock`. This is
+a client-side, on-theme soft gate — not real security.
+
 ## Running it
 
 PTerm is a static site — plain HTML/CSS/JS, no build step, no dependencies.
@@ -59,6 +63,10 @@ Type `help` in the terminal for the full list. Highlights:
 | `recent` | recently launched games |
 | `sources` | list configured sources and their status |
 | `sync` | re-fetch all catalogs from the CDN |
+| `mode [frame\|tab]` | play in the overlay, or in a new browser tab |
+| `retry` | relaunch the last game, trying other mirrors |
+| `passwd` / `lock` | change the password / re-lock the terminal |
+| `df`, `free`, `su` | more Linux flavor |
 | `fastfetch` / `neofetch` | system info + logo, the cool way |
 | `version`, `banner`, `about` | who/what/which |
 | `theme [green\|amber\|matrix\|ice\|mono]`, `crt`, `colors` | looks |
@@ -68,6 +76,21 @@ Type `help` in the terminal for the full list. Highlights:
 Input niceties: **Tab** completes commands, source flags (`S=`), and game names;
 **Up/Down** walk history; **Ctrl+L** clears; **Ctrl+C** cancels the line; games in
 listings are clickable. Inside a game, **Esc** or **Ctrl+Q** quits back to the shell.
+
+## If a game doesn't load
+
+Games come from third-party CDNs, and sometimes a specific game has been removed,
+is rate-limited, or refuses to run inside a frame. PTerm tries to route around it:
+
+- Every launch **preflights several mirrors** (jsDelivr → originfastly → githack →
+  statically) plus GN-Math's single-file (`html/<id>.html`) vs multi-file
+  (`assets/<id>/index.html`) paths, and mounts the first one that actually responds
+  (so a removed game/404 no longer shows a dead page).
+- `retry` relaunches the last game and re-picks a mirror.
+- `mode tab` opens games in a real browser tab instead of the overlay — the most
+  reliable option for games that block framing (allow pop-ups for the site).
+- `sync` re-fetches the catalogs and retries a source that failed earlier;
+  `sources` shows each source's status and game count.
 
 ## Sources
 

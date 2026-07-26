@@ -56,7 +56,9 @@ window.PTerm = window.PTerm || {};
   async function ensureLoaded(ctx, sourceKey) {
     const cat = PT.catalog;
     const targets = sourceKey ? [cat.resolveSource(sourceKey)] : cat.SOURCES;
-    const need = targets.filter((s) => s && !cat.isLoaded(s.key));
+    // when launching without a specific source, don't re-hammer a source that
+    // already failed this session (sync retries it); an explicit source always retries
+    const need = targets.filter((s) => s && !cat.isLoaded(s.key) && (sourceKey || !cat.state.error[s.key]));
     if (!need.length) return;
     for (const s of need) {
       ctx.print('<span class="c-dim">npm</span> : fetching catalog <span class="c-accent">[' +
@@ -606,10 +608,10 @@ window.PTerm = window.PTerm || {};
     aliases: ["restart"],
     group: "system",
     usage: "reboot",
-    desc: "replay the boot sequence.",
+    desc: "replay the boot sequence (re-locks).",
     async run(ctx) {
       ctx.clear();
-      await PT.boot.sequence(ctx);
+      await PT.boot.replay(ctx);
     },
   });
 
@@ -700,7 +702,7 @@ window.PTerm = window.PTerm || {};
   register({ name: "motd", group: "fun", usage: "motd", desc: "message of the day.",
     async run(ctx) { ctx.println(U.esc(FILES["/etc/motd"])); } });
 
-  register({ name: "exit", aliases: ["quit", "logout"], group: "fun", usage: "exit", desc: "there is no escape.",
+  register({ name: "exit", aliases: ["quit"], group: "fun", usage: "exit", desc: "there is no escape.",
     async run(ctx) {
       ctx.println('<span class="c-dim">logout</span>');
       await U.sleep(400);
@@ -891,6 +893,72 @@ window.PTerm = window.PTerm || {};
       }
       await U.sleep(200);
       ctx.println('<span class="c-warn b">ACCESS GRANTED</span> <span class="c-dim">(kidding. this is just PTerm.)</span>');
+    } });
+
+  register({ name: "passwd", group: "system", usage: "passwd", desc: "change the login password.",
+    async run(ctx) {
+      const n1 = await ctx.readLine({ prompt: '<span class="c-dim">New password:</span> ', mask: true });
+      if (!n1) { ctx.printError("password unchanged (empty)."); return; }
+      const n2 = await ctx.readLine({ prompt: '<span class="c-dim">Retype new password:</span> ', mask: true });
+      if (n1 !== n2) { ctx.printError("passwords do not match. unchanged."); return; }
+      U.store.set("password", n1);
+      ctx.println('<span class="c-ok">password updated.</span> <span class="c-dim">applies next time you</span> ' +
+        '<span class="c-accent">lock</span> <span class="c-dim">or reload.</span>');
+    } });
+
+  register({ name: "lock", aliases: ["logout"], group: "system", usage: "lock", desc: "lock the terminal (require the password).",
+    async run(ctx) {
+      ctx.clear();
+      ctx.printBlock(PT.ascii.render(PT.ascii.banner));
+      ctx.println("");
+      await PT.boot.login(ctx);
+      PT.boot.welcome(ctx);
+    } });
+
+  register({ name: "mode", group: "games", usage: "mode [frame|tab]", desc: "play in the overlay or a new browser tab.",
+    async run(ctx, args) {
+      const m = (args[0] || "").toLowerCase();
+      if (m !== "frame" && m !== "tab") {
+        const cur = U.store.get("launchMode") || "frame";
+        ctx.println('<span class="c-dim">launch mode:</span> <span class="c-accent">' + cur + "</span>");
+        ctx.println('<span class="c-dim">frame = in-terminal overlay . tab = new browser tab (better for games that block framing)</span>');
+        ctx.println('<span class="c-dim">set with</span> <span class="c-accent">mode tab</span> <span class="c-dim">or</span> <span class="c-accent">mode frame</span>');
+        return;
+      }
+      U.store.set("launchMode", m);
+      ctx.println("launch mode set to " + '<span class="c-accent">' + m + "</span>");
+    } });
+
+  register({ name: "retry", aliases: ["relaunch"], group: "games", usage: "retry", desc: "relaunch the last game (tries other mirrors).",
+    async run(ctx) {
+      const g = PT.launcher._lastGame;
+      if (!g) { ctx.printError("no game launched yet."); return; }
+      ctx.println('<span class="c-dim">retrying</span> ' + U.esc(g.name) + " ...");
+      PT.launcher.launch(g);
+    } });
+
+  register({ name: "df", group: "fun", usage: "df", desc: "disk usage.",
+    async run(ctx) {
+      ctx.println('<span class="c-dim">Filesystem      Size  Used Avail Use% Mounted on</span>');
+      ctx.println("/dev/portal0    9.0P  8.9P   64K 100% /");
+      ctx.println("gamefs      " + String((PT.catalog.all().length || "?")).padStart(8) + " games   -   -  /mnt/games");
+      ctx.println("tmpfs           1.0G     0  1.0G   0% /dev/coffee");
+    } });
+
+  register({ name: "free", group: "fun", usage: "free", desc: "memory usage.",
+    async run(ctx) {
+      const total = navigator.deviceMemory ? navigator.deviceMemory * 1024 : 8192;
+      const used = Math.floor(total * (0.5 + Math.random() * 0.2));
+      ctx.println('<span class="c-dim">              total        used        free</span>');
+      ctx.println("Mem:   " + String(total).padStart(11) + String(used).padStart(12) + String(total - used).padStart(12));
+      ctx.println("Swap:            0           0           0");
+    } });
+
+  register({ name: "su", group: "fun", usage: "su [user]", desc: "switch user.",
+    async run(ctx) {
+      await ctx.readLine({ prompt: '<span class="c-dim">Password:</span> ', mask: true });
+      await U.sleep(400);
+      ctx.println("su: Authentication failure");
     } });
 
   const FORTUNES = [
