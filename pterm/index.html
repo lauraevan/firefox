@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="green">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="PTerm - a terminal-based game launcher.">
+  <title>PTerm</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/pterm.css">
+</head>
+<body>
+  <div id="pt-screen" class="pt-screen">
+    <div id="pt-output" class="pt-output" aria-live="polite"></div>
+    <div id="pt-inputline" class="pt-inputline" hidden>
+      <span id="pt-prompt" class="pt-prompt"></span>
+      <span id="pt-rendered" class="pt-rendered"></span>
+    </div>
+    <textarea id="pt-capture" class="pt-capture" autocapitalize="off" autocomplete="off"
+              autocorrect="off" spellcheck="false" aria-label="terminal input"></textarea>
+  </div>
+
+  <div id="pt-overlay" class="pt-overlay" hidden>
+    <div class="pt-overlay-bar">
+      <span class="pt-overlay-title" id="pt-overlay-title">game</span>
+      <span class="pt-overlay-spacer"></span>
+      <span class="pt-overlay-hint">esc / ctrl+q to quit</span>
+      <button class="pt-overlay-btn" id="pt-overlay-newtab" title="Open in new tab">open ↗</button>
+      <button class="pt-overlay-btn" id="pt-overlay-full" title="Fullscreen">full ⤢</button>
+      <button class="pt-overlay-btn pt-overlay-close" id="pt-overlay-close" title="Quit game">quit ✕</button>
+    </div>
+    <div class="pt-overlay-body" id="pt-overlay-body">
+      <div class="pt-overlay-status" id="pt-overlay-status"></div>
+    </div>
+  </div>
+
+  <div class="pt-crt" aria-hidden="true"></div>
+
+  <script src="js/util.js" defer></script>
+  <script src="js/ascii.js" defer></script>
+  <script src="js/catalog.js" defer></script>
+  <script src="js/launcher.js" defer></script>
+  <script src="js/commands.js" defer></script>
+  <script src="js/terminal.js" defer></script>
+  <script src="js/boot.js" defer></script>
+</body>
+</html>
