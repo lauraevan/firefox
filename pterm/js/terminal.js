@@ -285,7 +285,20 @@ window.PTerm = window.PTerm || {};
       if (isFirst) {
         const prefix = (tokens[0] || "").toLowerCase();
         const names = PT.commands.commandNames().filter((n) => n.startsWith(prefix));
-        this._applyCompletion(prefix, names, false);
+        if (names.length) { this._applyCompletion(prefix, names, false); return; }
+        // no command matches -> complete a bare game name (easy mode)
+        if (prefix && PT.catalog.all().length) {
+          const matches = PT.catalog.all().filter((g) => g.name.toLowerCase().startsWith(prefix));
+          if (matches.length === 1) {
+            this._replaceLastWord(tokens[0], matches[0].name);
+          } else if (matches.length) {
+            const common = commonPrefix(matches.map((g) => g.name));
+            if (common.length > prefix.length) this._replaceLastWord(tokens[0], common);
+            this._appendLine('<span class="c-dim">' +
+              matches.slice(0, 16).map((g) => U.esc(g.name)).join("   ") +
+              (matches.length > 16 ? "   ..." : "") + "</span>");
+          }
+        }
         return;
       }
 
@@ -361,14 +374,17 @@ window.PTerm = window.PTerm || {};
     async runLine(line) {
       const tokens = U.tokenize(line);
       const name = tokens[0];
-      const cmd = PT.commands.resolve(name);
-      if (!cmd) {
-        this.printError("command not found: " + U.esc(name) +
-          '. type <span class="c-accent">help</span> for a list.');
-        this.showPrompt();
-        return;
+      let cmd = PT.commands.resolve(name);
+      let args, flags;
+      if (cmd) {
+        const parsed = U.parseFlags(tokens.slice(1));
+        args = parsed.args; flags = parsed.flags;
+      } else {
+        // easy mode: not a command -> treat the whole line as a game to launch
+        cmd = PT.commands.resolve("play");
+        const parsed = U.parseFlags(tokens);
+        args = parsed.args; flags = parsed.flags;
       }
-      const { args, flags } = U.parseFlags(tokens.slice(1));
       this._busy = true;
       this.hidePrompt();
       try {

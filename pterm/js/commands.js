@@ -73,6 +73,18 @@ window.PTerm = window.PTerm || {};
 
   /* ---------- game launch flow ---------- */
 
+  /* Easy parsing: game name can be many words with no quotes; the source is an
+     optional S=flag, or a trailing word that names a source (e.g. "slope gn"). */
+  function resolveNameAndSource(args, flags) {
+    let sourceKey = flags.s || flags.source || flags.src || null;
+    let parts = args.slice();
+    if (!sourceKey && parts.length > 1) {
+      const last = parts[parts.length - 1];
+      if (PT.catalog.resolveSource(last)) { sourceKey = last; parts = parts.slice(0, -1); }
+    }
+    return { name: parts.join(" ").trim(), sourceKey: sourceKey };
+  }
+
   async function launchGame(ctx, name, sourceKey) {
     const cat = PT.catalog;
     let source = null;
@@ -98,10 +110,11 @@ window.PTerm = window.PTerm || {};
 
     if (!exact && candidates.length === 0) {
       ctx.println("");
-      ctx.printError('package not found: "' + U.esc(name) + '"' +
+      ctx.printError('no game found: "' + U.esc(name) + '"' +
         (source ? " in " + U.esc(source.label) : ""));
       ctx.println('<span class="c-dim">try</span> <span class="c-accent">search ' +
-        U.esc(name) + '</span> <span class="c-dim">to find the right title.</span>');
+        U.esc(name) + '</span><span class="c-dim">, or</span> <span class="c-accent">help</span> ' +
+        '<span class="c-dim">for commands.</span>');
       return;
     }
 
@@ -151,30 +164,28 @@ window.PTerm = window.PTerm || {};
     desc: "the package manager. start, install, search and update games.",
     async run(ctx, args, flags) {
       const sub = (args[0] || "").toLowerCase();
-      const srcFlag = flags.s || flags.source || flags.src ||
-        args.slice(1).find((a) => PT.catalog.resolveSource(a));
 
       if (sub === "-v" || sub === "--version" || sub === "version") {
         ctx.println("npm@" + PT.env.version + " (psh)");
         return;
       }
       if (sub === "start" || sub === "run" || sub === "s") {
-        let positional = args.slice(1).filter((a) => a !== srcFlag);
-        if (sub === "run" && positional[0] && positional[0].toLowerCase() === "start") positional = positional.slice(1);
-        const name = positional[0];
-        if (!name) {
-          ctx.printError('missing game name.  usage: <span class="c-accent">npm start "&lt;Game Name&gt;" S=&lt;Source&gt;</span>');
+        let rest = args.slice(1);
+        if (sub === "run" && rest[0] && rest[0].toLowerCase() === "start") rest = rest.slice(1);
+        const ns = resolveNameAndSource(rest, flags);
+        if (!ns.name) {
+          ctx.printError('missing game name.  try <span class="c-accent">npm start cookie clicker</span>');
           return;
         }
-        await launchGame(ctx, name, srcFlag);
+        await launchGame(ctx, ns.name, ns.sourceKey);
         return;
       }
       if (sub === "install" || sub === "i" || sub === "add") {
-        const positional = args.slice(1).filter((a) => a !== srcFlag);
-        const name = positional[0];
-        if (!name) { ctx.printError('usage: npm install "&lt;Game Name&gt;" S=&lt;Source&gt;'); return; }
-        await ensureLoaded(ctx, srcFlag);
-        const { exact, candidates } = PT.catalog.find(name, srcFlag);
+        const nsi = resolveNameAndSource(args.slice(1), flags);
+        const name = nsi.name, sourceKey = nsi.sourceKey;
+        if (!name) { ctx.printError('usage: <span class="c-accent">npm install &lt;game&gt;</span>'); return; }
+        await ensureLoaded(ctx, sourceKey);
+        const { exact, candidates } = PT.catalog.find(name, sourceKey);
         const g = exact || (candidates.length === 1 ? candidates[0] : null);
         if (!g) {
           if (candidates.length > 1) {
@@ -204,11 +215,12 @@ window.PTerm = window.PTerm || {};
       ctx.println('<span class="c-dim">psh package manager</span>');
       ctx.println("");
       ctx.println("usage:");
-      ctx.println('  <span class="c-accent">npm start "&lt;Game Name&gt;" S=&lt;Source&gt;</span>   launch a game');
-      ctx.println('  <span class="c-accent">npm install "&lt;Game&gt;" S=&lt;Source&gt;</span>     stage a game');
-      ctx.println('  <span class="c-accent">npm search &lt;query&gt;</span>                  find games');
-      ctx.println('  <span class="c-accent">npm ls [source]</span>                     list games');
-      ctx.println('  <span class="c-accent">npm update</span>                          refresh catalogs');
+      ctx.println('  <span class="c-accent">npm start &lt;game name&gt;</span>       launch a game (no quotes needed)');
+      ctx.println('  <span class="c-accent">npm install &lt;game name&gt;</span>     stage a game');
+      ctx.println('  <span class="c-accent">npm search &lt;query&gt;</span>          find games');
+      ctx.println('  <span class="c-accent">npm ls [source]</span>             list games');
+      ctx.println('  <span class="c-accent">npm update</span>                  refresh catalogs');
+      ctx.println('<span class="c-dim">tip: you can just type</span> <span class="c-accent">play &lt;game name&gt;</span> <span class="c-dim">or even the name on its own.</span>');
       ctx.println("");
       ctx.println('<span class="c-dim">sources:</span> ' +
         PT.catalog.SOURCES.map((s) => '<span class="c-accent">' + s.label + "</span>").join(", "));
@@ -217,16 +229,14 @@ window.PTerm = window.PTerm || {};
 
   register({
     name: "play",
-    aliases: ["open", "launch"],
+    aliases: ["open", "launch", "start", "run", "p"],
     group: "games",
-    usage: 'play "<Game Name>" S=<Source>',
-    desc: "shortcut for npm start.",
+    usage: "play <game name>",
+    desc: "launch a game. no quotes needed, source optional.",
     async run(ctx, args, flags) {
-      const srcFlag = flags.s || flags.source || flags.src ||
-        args.find((a) => PT.catalog.resolveSource(a));
-      const name = args.filter((a) => a !== srcFlag)[0];
-      if (!name) { ctx.printError('usage: play "&lt;Game Name&gt;" S=&lt;Source&gt;'); return; }
-      await launchGame(ctx, name, srcFlag);
+      const ns = resolveNameAndSource(args, flags);
+      if (!ns.name) { ctx.printError('usage: <span class="c-accent">play &lt;game name&gt;</span>  (e.g. play cookie clicker)'); return; }
+      await launchGame(ctx, ns.name, ns.sourceKey);
     },
   });
 
@@ -285,9 +295,9 @@ window.PTerm = window.PTerm || {};
     usage: 'info "<Game Name>" [S=source]',
     desc: "show details for a game.",
     async run(ctx, args, flags) {
-      const srcFlag = flags.s || flags.source;
-      const name = args.filter((a) => a !== srcFlag)[0];
-      if (!name) { ctx.printError('usage: info "&lt;Game Name&gt;"'); return; }
+      const ns = resolveNameAndSource(args, flags);
+      const name = ns.name, srcFlag = ns.sourceKey;
+      if (!name) { ctx.printError('usage: <span class="c-accent">info &lt;game name&gt;</span>'); return; }
       await ensureLoaded(ctx, srcFlag);
       const { exact, candidates } = PT.catalog.find(name, srcFlag);
       const g = exact || (candidates.length === 1 ? candidates[0] : null);
@@ -422,7 +432,8 @@ window.PTerm = window.PTerm || {};
         });
       }
       ctx.println("");
-      ctx.println('<span class="c-dim">the headline act:</span> <span class="c-accent">npm start "Cookie Clicker" S=GN-Math</span>');
+      ctx.println('<span class="c-dim">easiest way to play:</span> <span class="c-accent">just type a game name</span> ' +
+        '<span class="c-dim">-- e.g.</span> <span class="c-accent">retro bowl</span> <span class="c-dim">or</span> <span class="c-accent">play slope</span>');
     },
   });
 
@@ -540,7 +551,7 @@ window.PTerm = window.PTerm || {};
       ctx.println('<span class="c-dim">catalogs:</span> ' + PT.catalog.SOURCES.map((s) => s.label).join(" . "));
       ctx.println('<span class="c-dim">try:</span> <span class="c-accent">fastfetch</span> . ' +
         '<span class="c-accent">ls</span> . <span class="c-accent">search slope</span> . ' +
-        '<span class="c-accent">npm start "Cookie Clicker" S=GN-Math</span>');
+        '<span class="c-accent">play cookie clicker</span>');
     },
   });
 
@@ -727,9 +738,9 @@ window.PTerm = window.PTerm || {};
     usage: 'fav "<Game>" [S=source]',
     desc: "star a game for quick access.",
     async run(ctx, args, flags) {
-      const srcFlag = flags.s || flags.source;
-      const name = args.filter((a) => a !== srcFlag)[0];
-      if (!name) { ctx.printError('usage: fav "&lt;Game&gt;"'); return; }
+      const ns = resolveNameAndSource(args, flags);
+      const name = ns.name, srcFlag = ns.sourceKey;
+      if (!name) { ctx.printError('usage: <span class="c-accent">fav &lt;game name&gt;</span>'); return; }
       await ensureLoaded(ctx, srcFlag);
       const { exact, candidates } = PT.catalog.find(name, srcFlag);
       const g = exact || (candidates.length === 1 ? candidates[0] : null);
@@ -753,8 +764,8 @@ window.PTerm = window.PTerm || {};
     usage: 'unfav "<Game>"',
     desc: "remove a star.",
     async run(ctx, args) {
-      const name = args[0];
-      if (!name) { ctx.printError('usage: unfav "&lt;Game&gt;"'); return; }
+      const name = args.join(" ").trim();
+      if (!name) { ctx.printError('usage: <span class="c-accent">unfav &lt;game name&gt;</span>'); return; }
       let favs = getFavs();
       const before = favs.length;
       const q = name.toLowerCase();
@@ -923,11 +934,12 @@ window.PTerm = window.PTerm || {};
       }
       size();
       const chars = "アイウエオ0123456789ABCDEF$+*<>=".split("");
+      const rainColor = (getComputedStyle(document.documentElement).getPropertyValue("--fg") || "#e6e6e6").trim() || "#e6e6e6";
       let raf;
       function draw() {
         g.fillStyle = "rgba(0,0,0,0.07)";
         g.fillRect(0, 0, cv.width, cv.height);
-        g.fillStyle = "#22ff44";
+        g.fillStyle = rainColor;
         g.font = fontSize + "px monospace";
         for (let i = 0; i < drops.length; i++) {
           g.fillText(chars[Math.floor(Math.random() * chars.length)], i * fontSize, drops[i] * fontSize);

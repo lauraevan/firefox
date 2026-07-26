@@ -2,12 +2,17 @@
 
 A terminal-based game launcher. PTerm boots into a fake Linux terminal with an
 ASCII `P` logo and launches browser games from public catalogs — but you have to
-_type_ for them. No menus, no big play buttons. You run the command, you get the
+_type_ for them. No menus, no big play buttons. You type the name, you get the
 game.
 
 ```
-guest@pterm:~$ npm start "Cookie Clicker" S=GN-Math
+guest@pterm:~$ cookie clicker
 ```
+
+That's it — just type a game name (no quotes, no source needed). Prefer the
+ceremony? `play cookie clicker` and `npm start "Cookie Clicker" S=GN-Math` still
+work. PTerm starts in a clean black-and-white theme; `theme green` (or `amber`,
+`matrix`, `ice`) and `crt on` bring back the retro glow.
 
 ## Running it
 

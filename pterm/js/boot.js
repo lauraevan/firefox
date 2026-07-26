@@ -60,9 +60,11 @@ window.PTerm = window.PTerm || {};
         '"  //  a terminal you have to earn</span>');
       ctx.println("");
       ctx.println('welcome to <span class="c-accent b">PTerm</span>. games are launched, not clicked.');
-      ctx.println('type <span class="c-accent">help</span> to see commands, ' +
-        '<span class="c-accent">fastfetch</span> to show off, or dive straight in:');
-      ctx.println('  <span class="c-accent">npm start "Cookie Clicker" S=GN-Math</span>');
+      ctx.println('<span class="c-dim">just type a game name to play it -- e.g.</span> <span class="c-accent">cookie clicker</span>');
+      ctx.println('<span class="c-dim">or:</span> <span class="c-accent">ls</span> <span class="c-dim">browse .</span> ' +
+        '<span class="c-accent">search slope</span> <span class="c-dim">find .</span> ' +
+        '<span class="c-accent">help</span> <span class="c-dim">everything .</span> ' +
+        '<span class="c-accent">theme green</span> <span class="c-dim">for color</span>');
       ctx.println("");
     },
 

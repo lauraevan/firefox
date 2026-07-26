@@ -39,10 +39,10 @@
   --glow: 0 0 5px rgba(111, 214, 255, 0.45);
 }
 :root[data-theme="mono"] {
-  --bg: #0a0a0a; --bg-soft: #131313;
-  --fg: #e6e6e6; --fg-dim: #9a9a9a; --fg-mute: #5c5c5c;
-  --accent: #ffffff; --link: #bcbcbc;
-  --selection: rgba(230, 230, 230, 0.25);
+  --bg: #000000; --bg-soft: #0c0c0c;
+  --fg: #e8e8e8; --fg-dim: #8f8f8f; --fg-mute: #565656;
+  --accent: #ffffff; --warn: #cfcfcf; --error: #ffffff; --link: #ffffff;
+  --selection: rgba(255, 255, 255, 0.22);
   --glow: none;
 }
 :root[data-nocrt="1"] { --scanline: 0; --flicker: 0; --glow: none; }
