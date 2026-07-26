@@ -19,9 +19,12 @@ window.PTerm = window.PTerm || {};
       label: "GN-Math",
       aliases: ["gnmath", "gn", "gm", "gnm"],
       type: "json",
+      // local snapshot first (same origin as the deploy, so it can't be blocked
+      // separately from the page); CDNs are refresh fallbacks.
       catalogUrls: [
+        "data/gn-math.zones.json",
         "https://cdn.jsdelivr.net/gh/gn-math/assets@main/zones.json",
-        "https://originfastly.jsdelivr.net/gh/gn-math/assets@main/zones.json",
+        "https://fastly.jsdelivr.net/gh/gn-math/assets@main/zones.json",
         "https://raw.githubusercontent.com/gn-math/assets/main/zones.json",
       ],
       placeholders: {
@@ -43,8 +46,9 @@ window.PTerm = window.PTerm || {};
       type: "js",
       jsParse: "text",
       catalogUrls: [
+        "data/strongdog.cards.js",
         "https://cdn.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master/cards-data.js",
-        "https://originfastly.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master/cards-data.js",
+        "https://fastly.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master/cards-data.js",
         "https://raw.githubusercontent.com/IAmNotTechnoblade/strongdogxp/master/cards-data.js",
       ],
       gameBase: "https://cdn.jsdelivr.net/gh/IAmNotTechnoblade/strongdogxp@master",
@@ -59,8 +63,9 @@ window.PTerm = window.PTerm || {};
       aliases: ["tr", "truffle", "truf"],
       type: "json",
       catalogUrls: [
+        "data/truffled.g.json",
         "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json",
-        "https://originfastly.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json",
+        "https://fastly.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json",
         "https://raw.githubusercontent.com/aukak/truffled/main/public/js/json/g.json",
       ],
       gameBase: "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public",

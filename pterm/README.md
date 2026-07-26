@@ -65,8 +65,10 @@ Type `help` in the terminal for the full list. Highlights:
 | `sync` | re-fetch all catalogs from the CDN |
 | `mode [frame\|tab]` | play in the overlay, or in a new browser tab |
 | `retry` | relaunch the last game, trying other mirrors |
+| `fastfetch [distro]` / `logo` | system info with a saved distro logo (arch, ubuntu, mint, ...) |
+| `diag` | test connectivity to each source / CDN |
 | `passwd` / `lock` | change the password / re-lock the terminal |
-| `df`, `free`, `su` | more Linux flavor |
+| `df`, `free`, `su`, `rev`, `yes` | more Linux flavor |
 | `fastfetch` / `neofetch` | system info + logo, the cool way |
 | `version`, `banner`, `about` | who/what/which |
 | `theme [green\|amber\|matrix\|ice\|mono]`, `crt`, `colors` | looks |
@@ -76,6 +78,21 @@ Type `help` in the terminal for the full list. Highlights:
 Input niceties: **Tab** completes commands, source flags (`S=`), and game names;
 **Up/Down** walk history; **Ctrl+L** clears; **Ctrl+C** cancels the line; games in
 listings are clickable. Inside a game, **Esc** or **Ctrl+Q** quits back to the shell.
+
+## Catalogs are bundled (why sources always load)
+
+The three catalogs are committed as a snapshot under [`data/`](data/) (GN-Math
+`zones.json`, Strongdog `cards-data.js`, Truffled `g.json`). PTerm loads them from
+there **first** — same origin as the deployed page, so they can't be blocked
+separately from the site. The live CDNs are only used as refresh fallbacks. This is
+why "all sources error" is fixed even on networks that block jsDelivr / GitHub:
+run `diag` to see local (`data/…`) vs remote reachability. To refresh the snapshot,
+re-download those files from the source repos and commit them (~340 KB total).
+
+Note the **games themselves** still stream from CDNs (they're gigabytes — can't be
+bundled). If a network blocks every game CDN, games won't launch even though the
+catalog does; the launcher tries jsDelivr → originfastly → githack → statically per
+game to maximize the odds.
 
 ## If a game doesn't load
 

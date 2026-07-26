@@ -481,10 +481,18 @@ window.PTerm = window.PTerm || {};
     name: "fastfetch",
     aliases: ["neofetch", "ff"],
     group: "system",
-    usage: "fastfetch",
-    desc: "display system information the cool way.",
-    async run(ctx) {
+    usage: "fastfetch [distro]",
+    desc: "system info with a distro logo (see: logo).",
+    async run(ctx, args) {
       const e = PT.env;
+      const logoName = args && args[0] ? args[0].toLowerCase() : (U.store.get("fetchLogo") || "pterm");
+      const OSNAMES = {
+        pterm: "PTerm Linux", arch: "Arch Linux", blackarch: "BlackArch Linux",
+        ubuntu: "Ubuntu", mint: "Linux Mint", debian: "Debian GNU/Linux",
+        fedora: "Fedora Linux", kali: "Kali GNU/Linux", gentoo: "Gentoo",
+        pop: "Pop!_OS", nixos: "NixOS", void: "Void Linux", tux: "Linux", windows: "Windows",
+      };
+      const osName = OSNAMES[logoName] || e.os;
       const title = e.user + "@" + e.host;
       const uptime = U.fmtDuration(Date.now() - e.bootTime);
       const games = PT.catalog.all().length;
@@ -496,7 +504,7 @@ window.PTerm = window.PTerm || {};
       const res = window.innerWidth + " x " + window.innerHeight;
 
       const rows = [
-        ["OS", e.os + " x86_64"],
+        ["OS", osName + " x86_64"],
         ["Host", "Portal Terminal (web)"],
         ["Kernel", e.kernel],
         ["Uptime", uptime],
@@ -520,7 +528,7 @@ window.PTerm = window.PTerm || {};
         .map((v) => '<span style="color:var(' + v + ')">' + "███" + "</span>").join("");
       info += '<div class="pt-fetch-palette">' + pal + "</div>";
 
-      const logo = '<div class="pt-fetch-logo">' + U.esc(PT.ascii.pLogo.join("\n")) + "</div>";
+      const logo = '<div class="pt-fetch-logo">' + U.esc(PT.ascii.logo(logoName).join("\n")) + "</div>";
       ctx.printBlock('<div class="pt-fetch">' + logo + '<div class="pt-fetch-info">' + info + "</div></div>");
     },
   });
@@ -893,6 +901,71 @@ window.PTerm = window.PTerm || {};
       }
       await U.sleep(200);
       ctx.println('<span class="c-warn b">ACCESS GRANTED</span> <span class="c-dim">(kidding. this is just PTerm.)</span>');
+    } });
+
+  register({ name: "logo", aliases: ["distros", "setlogo"], group: "system", usage: "logo [name|random|reset]",
+    desc: "choose & save the fastfetch logo.",
+    async run(ctx, args) {
+      const names = PT.ascii.distroNames();
+      const cur = U.store.get("fetchLogo") || "pterm";
+      let name = (args[0] || "").toLowerCase();
+      if (!name) {
+        ctx.println('<span class="c-dim">saved logo:</span> <span class="c-accent">' + cur + "</span>");
+        ctx.println('<span class="c-dim">available:</span> ' +
+          names.map((n) => (n === cur ? '<span class="c-accent">' + n + "</span>" : n)).join(", "));
+        ctx.println('<span class="c-dim">set with</span> <span class="c-accent">logo &lt;name&gt;</span>' +
+          '<span class="c-dim">, preview one with</span> <span class="c-accent">fastfetch &lt;name&gt;</span>');
+        return;
+      }
+      if (name === "reset") name = "pterm";
+      if (name === "random") name = U.pick(names);
+      if (names.indexOf(name) < 0) { ctx.printError('unknown logo "' + U.esc(name) + '". options: ' + names.join(", ")); return; }
+      U.store.set("fetchLogo", name);
+      ctx.println("saved logo: " + '<span class="c-accent">' + name + "</span>");
+      await registry.fastfetch.run(ctx, [name]);
+    } });
+
+  async function probe(url) {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 6000);
+      const res = await fetch(url, { method: "HEAD", mode: "cors", credentials: "omit", signal: ctrl.signal });
+      clearTimeout(t);
+      return res.ok ? '<span class="c-ok">ok</span>' : '<span class="c-warn">HTTP ' + res.status + "</span>";
+    } catch (e) { return '<span class="c-error">blocked/failed</span>'; }
+  }
+
+  register({ name: "diag", aliases: ["doctor", "net"], group: "system", usage: "diag", desc: "test connectivity to each source.",
+    async run(ctx) {
+      ctx.println('<span class="c-accent b">connectivity check</span>');
+      for (const s of PT.catalog.SOURCES) {
+        ctx.println('<span class="c-dim">' + U.esc(s.label) + "</span>");
+        for (const url of s.catalogUrls) {
+          ctx.print("  " + U.esc(url.length > 62 ? url.slice(0, 59) + "..." : url) + " ... ");
+          ctx.appendToLast(await probe(url));
+        }
+      }
+      const g = PT.catalog.all()[0];
+      if (g) {
+        ctx.println('<span class="c-dim">sample game -- ' + U.esc(g.name) + "</span>");
+        ctx.print("  " + U.esc((g.launchUrl || "").slice(0, 59)) + " ... ");
+        ctx.appendToLast(await probe(g.launchUrl));
+      }
+      ctx.println("");
+      ctx.println('<span class="c-dim">if the local</span> <span class="c-accent">data/...</span> <span class="c-dim">rows are ok but remote CDNs are blocked,</span>');
+      ctx.println('<span class="c-dim">your network is filtering the CDNs -- catalogs still load from the bundled copy.</span>');
+    } });
+
+  register({ name: "rev", group: "fun", usage: "rev <text>", desc: "reverse text.",
+    async run(ctx, args, flags, raw) {
+      ctx.println(U.esc(raw.replace(/^rev\s?/, "").split("").reverse().join("")));
+    } });
+
+  register({ name: "yes", group: "fun", usage: "yes [text]", desc: "affirmative (bounded).",
+    async run(ctx, args, flags, raw) {
+      const t = raw.replace(/^yes\s?/, "") || "y";
+      for (let i = 0; i < 12; i++) ctx.println(U.esc(t));
+      ctx.println('<span class="c-dim">(a real terminal would go forever -- ctrl+c)</span>');
     } });
 
   register({ name: "passwd", group: "system", usage: "passwd", desc: "change the login password.",
