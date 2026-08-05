@@ -1,5 +1,5 @@
-/* PTerm - terminal engine: I/O, input line, history, tab completion */
-window.PTerm = window.PTerm || {};
+/* Arkeus - terminal engine: I/O, input line, history, tab completion */
+window.Arkeus = window.Arkeus || {};
 
 (function (PT) {
   "use strict";
@@ -27,11 +27,7 @@ window.PTerm = window.PTerm || {};
       this._history = U.store.get("history") || [];
       this._histIdx = this._history.length;
 
-      this.promptHTML =
-        '<span class="c-dim">' + PT.env.user + "@" + PT.env.host + "</span>" +
-        '<span class="c-mute">:</span><span class="c-accent">~</span>' +
-        '<span class="c-mute">$</span> ';
-      this.promptEl.innerHTML = this.promptHTML;
+      this.updatePrompt();
 
       this._bindKeys();
 
@@ -103,8 +99,18 @@ window.PTerm = window.PTerm || {};
 
     /* ---------- prompt / input line ---------- */
 
+    updatePrompt() {
+      const cwd = (PT.vfs && PT.vfs.cwdDisplay) ? PT.vfs.cwdDisplay() : "~";
+      this.promptHTML =
+        '<span class="c-dim">' + PT.env.user + "@" + PT.env.host + "</span>" +
+        '<span class="c-mute">:</span><span class="c-accent">' + U.esc(cwd) + "</span>" +
+        '<span class="c-mute">$</span> ';
+      if (this.promptEl && !this._pending) this.promptEl.innerHTML = this.promptHTML;
+    },
+
     showPrompt() {
       this._busy = false;
+      this.updatePrompt();
       this.inputLine.hidden = false;
       this._render();
       this.focus();
@@ -455,4 +461,4 @@ window.PTerm = window.PTerm || {};
   }
 
   PT.terminal = terminal;
-})(window.PTerm);
+})(window.Arkeus);

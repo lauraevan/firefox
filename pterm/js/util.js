@@ -1,5 +1,5 @@
-/* PTerm - shared utilities */
-window.PTerm = window.PTerm || {};
+/* Arkeus - shared utilities */
+window.Arkeus = window.Arkeus || {};
 
 (function (PT) {
   "use strict";
@@ -126,11 +126,11 @@ window.PTerm = window.PTerm || {};
   util.store = {
     get(key) {
       try {
-        const raw = localStorage.getItem("pterm:" + key);
+        const raw = localStorage.getItem("arkeus:" + key);
         if (!raw) return null;
         const obj = JSON.parse(raw);
         if (obj && obj.exp && Date.now() > obj.exp) {
-          localStorage.removeItem("pterm:" + key);
+          localStorage.removeItem("arkeus:" + key);
           return null;
         }
         return obj ? obj.v : null;
@@ -140,12 +140,12 @@ window.PTerm = window.PTerm || {};
       try {
         const obj = { v: value };
         if (ttlMs) obj.exp = Date.now() + ttlMs;
-        localStorage.setItem("pterm:" + key, JSON.stringify(obj));
+        localStorage.setItem("arkeus:" + key, JSON.stringify(obj));
         return true;
       } catch (e) { return false; }
     },
     del(key) {
-      try { localStorage.removeItem("pterm:" + key); } catch (e) {}
+      try { localStorage.removeItem("arkeus:" + key); } catch (e) {}
     },
   };
 
@@ -163,4 +163,4 @@ window.PTerm = window.PTerm || {};
   };
 
   PT.util = util;
-})(window.PTerm);
+})(window.Arkeus);

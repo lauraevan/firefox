@@ -1,5 +1,5 @@
-/* PTerm - game launcher overlay */
-window.PTerm = window.PTerm || {};
+/* Arkeus - game launcher overlay */
+window.Arkeus = window.Arkeus || {};
 
 (function (PT) {
   "use strict";
@@ -159,7 +159,7 @@ window.PTerm = window.PTerm || {};
       this._game = null;
       if (PT.terminal) {
         PT.terminal.focus();
-        if (g) PT.terminal.println('<span class="c-dim">[psh] session for </span>' +
+        if (g) PT.terminal.println('<span class="c-dim">[ash] session for </span>' +
           U.esc(g.name) + '<span class="c-dim"> ended. exit code 0</span>');
         PT.terminal.showPrompt();
       }
@@ -167,4 +167,4 @@ window.PTerm = window.PTerm || {};
   };
 
   PT.launcher = launcher;
-})(window.PTerm);
+})(window.Arkeus);

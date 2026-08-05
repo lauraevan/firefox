@@ -1,5 +1,5 @@
-/* PTerm - boot sequence and wiring */
-window.PTerm = window.PTerm || {};
+/* Arkeus - boot sequence and wiring */
+window.Arkeus = window.Arkeus || {};
 
 (function (PT) {
   "use strict";
@@ -17,14 +17,14 @@ window.PTerm = window.PTerm || {};
 
   function setupEnv() {
     PT.env = {
-      version: "1.1.0",
-      codename: "Portal",
-      build: buildHash("PTerm-1.1.0-Portal"),
+      version: "2.0.0",
+      codename: "Aegis",
+      build: buildHash("Arkeus-2.0.0-Aegis"),
       user: "guest",
-      host: "pterm",
-      shell: "psh",
-      kernel: "6.6.6-portal",
-      os: "PTerm Linux",
+      host: "arkeus",
+      shell: "ash",
+      kernel: "6.6.6-aegis",
+      os: "Arkeus Linux",
       bootTime: Date.now(),
     };
   }
@@ -41,15 +41,15 @@ window.PTerm = window.PTerm || {};
       const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const spd = reduce ? 0 : 2;
 
-      ctx.println('<span class="c-dim">PTerm BIOS v1.0 -- Portal Systems, Inc.</span>');
+      ctx.println('<span class="c-dim">Arkeus BIOS v1.0 -- Aegis Systems, Inc.</span>');
       const lines = [
-        "[    0.000000] portal: cold boot, seeding entropy from /dev/coffee",
+        "[    0.000000] aegis: cold boot, seeding entropy from /dev/coffee",
         "[    0.014287] cpu: mounting virtual cores ....... ok",
         "[    0.041902] mem: paging games into orbit ...... ok",
         "[    0.088331] net: linking CDN mirrors .......... ok",
         "[    0.132004] fs: mounting /dev/games ........... ok",
         "[    0.170553] auth: session opened for guest",
-        "[    0.201120] psh: starting portal shell ........ ok",
+        "[    0.201120] ash: starting aegis shell ........ ok",
       ];
       for (const l of lines) {
         await ctx.typeText(l, { speed: spd, cls: "c-dim" });
@@ -62,30 +62,33 @@ window.PTerm = window.PTerm || {};
     },
 
     async login(ctx) {
-      const stored = U.store.get("password");
-      const pass = stored == null ? "portal" : stored;
-      ctx.println('<span class="c-dim">portal secure shell -- authentication required</span>');
+      if (!PT.auth.available()) {
+        ctx.println('<span class="c-warn">secure context unavailable -- serve over https to enable the login gate.</span>');
+        return;
+      }
+      const custom = PT.auth.isCustom();
+      ctx.println('<span class="c-dim">arkeus secure shell -- authentication required</span>');
       ctx.println("login: " + '<span class="c-accent">' + PT.env.user + "</span>");
-      if (stored == null) {
-        ctx.println('<span class="c-mute">(first run: the password is "portal" -- change it with </span>' +
+      if (!custom) {
+        ctx.println('<span class="c-mute">(first run: password is "arkeus" -- change it immediately with </span>' +
           '<span class="c-accent">passwd</span><span class="c-mute">)</span>');
       }
-      for (;;) {
+      for (let tries = 0; ; tries++) {
         const entry = await ctx.readLine({ prompt: '<span class="c-dim">Password:</span> ', mask: true });
-        if (entry === pass) { ctx.println('<span class="c-ok">access granted.</span>'); await U.sleep(250); return; }
+        if (await PT.auth.verify(entry)) { ctx.println('<span class="c-ok">access granted.</span>'); await U.sleep(220); return; }
         ctx.println('<span class="c-error">access denied.</span>');
-        await U.sleep(500);
+        await U.sleep(400 + Math.min(tries, 5) * 200);
       }
     },
 
     welcome(ctx) {
       ctx.println("");
-      ctx.println('welcome to <span class="c-accent b">PTerm</span>. games are launched, not clicked.');
+      ctx.println('welcome to <span class="c-accent b">Arkeus</span>. games are launched, not clicked.');
       ctx.println('<span class="c-dim">just type a game name to play it -- e.g.</span> <span class="c-accent">cookie clicker</span>');
-      ctx.println('<span class="c-dim">or:</span> <span class="c-accent">ls</span> <span class="c-dim">browse .</span> ' +
+      ctx.println('<span class="c-dim">or:</span> <span class="c-accent">games</span> <span class="c-dim">browse .</span> ' +
         '<span class="c-accent">search slope</span> <span class="c-dim">find .</span> ' +
         '<span class="c-accent">help</span> <span class="c-dim">everything .</span> ' +
-        '<span class="c-accent">theme green</span> <span class="c-dim">for color</span>');
+        '<span class="c-accent">ls</span> <span class="c-dim">files</span>');
       ctx.println("");
     },
 
@@ -118,4 +121,4 @@ window.PTerm = window.PTerm || {};
   } else {
     boot.start();
   }
-})(window.PTerm);
+})(window.Arkeus);

@@ -1,5 +1,5 @@
-/* PTerm - command registry and implementations */
-window.PTerm = window.PTerm || {};
+/* Arkeus - command registry and implementations */
+window.Arkeus = window.Arkeus || {};
 
 (function (PT) {
   "use strict";
@@ -48,7 +48,7 @@ window.PTerm = window.PTerm || {};
     if (games.length > limit) {
       html += '<div class="c-dim">... and ' + (games.length - limit) +
         ' more. narrow it down with <span class="c-accent">search &lt;query&gt;</span>' +
-        ' or list everything with <span class="c-accent">ls --all</span>.</div>';
+        ' or list everything with <span class="c-accent">games --all</span>.</div>';
     }
     return html;
   }
@@ -99,7 +99,7 @@ window.PTerm = window.PTerm || {};
       }
     }
 
-    ctx.println('<span class="c-dim">&gt; pterm@' + PT.env.version + " start</span>");
+    ctx.println('<span class="c-dim">&gt; arkeus@' + PT.env.version + " start</span>");
     ctx.println('<span class="c-dim">&gt; launch </span>"' + U.esc(name) + '"' +
       (source ? ' <span class="c-dim">--source</span> ' + U.esc(source.label) : ""));
     ctx.println("");
@@ -134,7 +134,7 @@ window.PTerm = window.PTerm || {};
       "resolving assets",
       "verifying integrity",
       "building dependency tree",
-      "mounting sandbox /dev/portal0",
+      "mounting sandbox /dev/aegis0",
     ];
     for (const s of steps) {
       const dots = ".".repeat(18 - Math.min(16, s.length));
@@ -168,7 +168,7 @@ window.PTerm = window.PTerm || {};
       const sub = (args[0] || "").toLowerCase();
 
       if (sub === "-v" || sub === "--version" || sub === "version") {
-        ctx.println("npm@" + PT.env.version + " (psh)");
+        ctx.println("npm@" + PT.env.version + " (ash)");
         return;
       }
       if (sub === "start" || sub === "run" || sub === "s") {
@@ -212,9 +212,9 @@ window.PTerm = window.PTerm || {};
         return registry.sync.run(ctx, [], flags);
       }
       if (sub === "ls" || sub === "list" || sub === "ll") {
-        return registry.ls.run(ctx, args.slice(1), flags);
+        return registry.games.run(ctx, args.slice(1), flags);
       }
-      ctx.println('<span class="c-dim">psh package manager</span>');
+      ctx.println('<span class="c-dim">ash package manager</span>');
       ctx.println("");
       ctx.println("usage:");
       ctx.println('  <span class="c-accent">npm start &lt;game name&gt;</span>       launch a game (no quotes needed)');
@@ -243,10 +243,10 @@ window.PTerm = window.PTerm || {};
   });
 
   register({
-    name: "ls",
-    aliases: ["games", "list", "dir"],
+    name: "games",
+    aliases: ["catalog", "gl"],
     group: "games",
-    usage: "ls [source] [--all]",
+    usage: "games [source] [--all]",
     desc: "list available games (optionally from one source).",
     async run(ctx, args, flags) {
       const srcArg = args.find((a) => PT.catalog.resolveSource(a));
@@ -420,7 +420,7 @@ window.PTerm = window.PTerm || {};
         printMan(ctx, c);
         return;
       }
-      ctx.println('<span class="c-accent b">PTerm</span> <span class="c-dim">command reference</span>  ' +
+      ctx.println('<span class="c-accent b">Arkeus</span> <span class="c-dim">command reference</span>  ' +
         '<span class="c-mute">// tab completes, up/down recalls history</span>');
       const groups = { games: "games", system: "system", shell: "shell", fun: "fun & misc" };
       for (const gk of Object.keys(groups)) {
@@ -464,10 +464,10 @@ window.PTerm = window.PTerm || {};
     aliases: ["-v", "--version", "ver"],
     group: "system",
     usage: "version",
-    desc: "show PTerm version and build info.",
+    desc: "show Arkeus version and build info.",
     async run(ctx) {
       const e = PT.env;
-      ctx.println('<span class="c-accent b">PTerm</span> v' + e.version +
+      ctx.println('<span class="c-accent b">Arkeus</span> v' + e.version +
         ' <span class="c-dim">"' + e.codename + '"</span>');
       ctx.println('<span class="c-dim">build   :</span> ' + e.build);
       ctx.println('<span class="c-dim">kernel  :</span> ' + e.kernel);
@@ -485,9 +485,9 @@ window.PTerm = window.PTerm || {};
     desc: "system info with a distro logo (see: logo).",
     async run(ctx, args) {
       const e = PT.env;
-      const logoName = args && args[0] ? args[0].toLowerCase() : (U.store.get("fetchLogo") || "pterm");
+      const logoName = args && args[0] ? args[0].toLowerCase() : (U.store.get("fetchLogo") || "arkeus");
       const OSNAMES = {
-        pterm: "PTerm Linux", arch: "Arch Linux", blackarch: "BlackArch Linux",
+        arkeus: "Arkeus Linux", arch: "Arch Linux", blackarch: "BlackArch Linux",
         ubuntu: "Ubuntu", mint: "Linux Mint", debian: "Debian GNU/Linux",
         fedora: "Fedora Linux", kali: "Kali GNU/Linux", gentoo: "Gentoo",
         pop: "Pop!_OS", nixos: "NixOS", void: "Void Linux", tux: "Linux", windows: "Windows",
@@ -505,14 +505,14 @@ window.PTerm = window.PTerm || {};
 
       const rows = [
         ["OS", osName + " x86_64"],
-        ["Host", "Portal Terminal (web)"],
+        ["Host", "Aegis Terminal (web)"],
         ["Kernel", e.kernel],
         ["Uptime", uptime],
         ["Packages", pkgLine],
         ["Shell", e.shell + " 1.0"],
         ["Resolution", res],
         ["DE", "TTY"],
-        ["Terminal", "PTerm"],
+        ["Terminal", "Arkeus"],
         ["CPU", cpu],
         ["Memory", mem],
         ["Sources", srcCount + " (" + PT.catalog.SOURCES.map((s) => s.key).join(", ") + ")"],
@@ -538,7 +538,7 @@ window.PTerm = window.PTerm || {};
     aliases: ["logo", "figlet"],
     group: "system",
     usage: "banner",
-    desc: "print the PTerm wordmark.",
+    desc: "print the Arkeus wordmark.",
     async run(ctx) {
       ctx.printBlock(PT.ascii.render(PT.ascii.banner));
       ctx.println('<span class="c-dim">        a terminal you have to earn // </span><span class="c-accent">help</span>');
@@ -547,14 +547,14 @@ window.PTerm = window.PTerm || {};
 
   register({
     name: "about",
-    aliases: ["credits", "info-pterm"],
+    aliases: ["credits", "info-arkeus"],
     group: "system",
     usage: "about",
-    desc: "what is PTerm?",
+    desc: "what is Arkeus?",
     async run(ctx) {
-      ctx.println('<span class="c-accent b">PTerm</span> <span class="c-dim">// the terminal game launcher</span>');
+      ctx.println('<span class="c-accent b">Arkeus</span> <span class="c-dim">// the terminal game launcher</span>');
       ctx.println("");
-      ctx.println("PTerm is a fake-Linux terminal that launches browser games from");
+      ctx.println("Arkeus is a fake-Linux terminal that launches browser games from");
       ctx.println("public catalogs. no menus, no big buttons -- you type the command,");
       ctx.println("you get the game. that's the whole bit.");
       ctx.println("");
@@ -652,48 +652,111 @@ window.PTerm = window.PTerm || {};
   register({ name: "uname", group: "shell", usage: "uname [-a]", desc: "print system info.",
     async run(ctx, args) {
       if (args.includes("-a") || args.includes("--all")) {
-        ctx.println([PT.env.os, PT.env.host, PT.env.kernel, "#1 SMP PREEMPT", "x86_64", "Portal/psh"].join(" "));
+        ctx.println([PT.env.os, PT.env.host, PT.env.kernel, "#1 SMP PREEMPT", "x86_64", "Aegis/ash"].join(" "));
       } else ctx.println(PT.env.os);
     } });
 
   register({ name: "date", group: "shell", usage: "date", desc: "print the current date.",
     async run(ctx) { ctx.println(new Date().toString()); } });
 
-  register({ name: "uptime", group: "shell", usage: "uptime", desc: "how long PTerm has been up.",
+  register({ name: "uptime", group: "shell", usage: "uptime", desc: "how long Arkeus has been up.",
     async run(ctx) {
       const up = U.fmtDuration(Date.now() - PT.env.bootTime);
       ctx.println(new Date().toLocaleTimeString() + "  up " + up + ",  1 user,  load average: 0.07, 0.03, 0.00");
     } });
 
-  register({ name: "pwd", group: "shell", usage: "pwd", desc: "print working directory.",
-    async run(ctx) { ctx.println("/home/" + PT.env.user); } });
-
-  register({ name: "cd", group: "shell", hidden: true, usage: "cd <dir>", desc: "change directory.",
+  register({ name: "ls", aliases: ["dir", "ll"], group: "shell", usage: "ls [-l] [-a] [path]", desc: "list directory contents.",
     async run(ctx, args) {
-      if (!args[0] || args[0] === "~" || args[0] === "/home/" + PT.env.user) return;
-      ctx.println('<span class="c-dim">psh: cd: ' + U.esc(args[0]) + ": this is not that kind of filesystem</span>");
+      const flagstr = args.filter((a) => a[0] === "-").join("");
+      const long = flagstr.indexOf("l") >= 0;
+      const all = flagstr.indexOf("a") >= 0;
+      const path = args.filter((a) => a[0] !== "-")[0];
+      const r = PT.vfs.list(path);
+      if (r.err) { ctx.printError("ls: " + U.esc(path || ".") + ": " + r.err); return; }
+      let entries = r.entries;
+      if (!all) entries = entries.filter((e) => e.name[0] !== ".");
+      const fmt = (e) => e.node.type === "dir" ? '<span class="c-accent">' + U.esc(e.name) + "/</span>" : U.esc(e.name);
+      if (long) {
+        entries.forEach((e) => {
+          const d = e.node.type === "dir";
+          const size = d ? 4096 : (e.node.content || "").length;
+          ctx.println('<span class="c-dim">' + (d ? "drwxr-xr-x" : "-rw-r--r--") +
+            " guest guest " + String(size).padStart(5) + "</span>  " + fmt(e));
+        });
+        if (!entries.length) ctx.println('<span class="c-dim">(empty)</span>');
+      } else {
+        ctx.printBlock('<div class="pt-cols">' + entries.map((e) => "<div>" + fmt(e) + "</div>").join("") + "</div>");
+      }
     } });
 
-  register({ name: "ls-files", group: "shell", hidden: true, usage: "ls-files", desc: "",
-    async run(ctx) { ctx.println("games/  bin/  dev/  etc/  .secret"); } });
+  register({ name: "cd", group: "shell", usage: "cd [dir]", desc: "change directory.",
+    async run(ctx, args) {
+      const r = PT.vfs.cd(args[0] || "~");
+      if (r.err) ctx.printError("cd: " + U.esc(args[0] || "") + ": " + r.err);
+    } });
 
-  const FILES = {
-    "/etc/os-release": [
-      'NAME="PTerm Linux"', 'PRETTY_NAME="PTerm Linux (Portal)"', "ID=pterm",
-      "VERSION=\"1.0 (Portal)\"", "HOME_URL=\"about:pterm\"",
-    ].join("\n"),
-    "/etc/motd": "welcome to PTerm. games are earned, not clicked.",
-    "readme": "type `help`. the magic word is `npm start`.",
-    "/home/guest/.secret": "there is no secret. (ok fine: try `theme matrix`)",
-  };
+  register({ name: "pwd", group: "shell", usage: "pwd", desc: "print working directory.",
+    async run(ctx) { ctx.println(PT.vfs.cwd()); } });
 
   register({ name: "cat", group: "shell", usage: "cat <file>", desc: "print a file.",
     async run(ctx, args) {
-      const f = (args[0] || "").toLowerCase();
-      if (!f) { ctx.printError("usage: cat &lt;file&gt;"); return; }
-      const key = Object.keys(FILES).find((k) => k.toLowerCase() === f || k.toLowerCase().endsWith("/" + f));
-      if (key) ctx.println(U.esc(FILES[key]));
-      else ctx.println('<span class="c-dim">cat: ' + U.esc(args[0]) + ": No such file or directory</span>");
+      if (!args[0]) { ctx.printError("usage: cat &lt;file&gt;"); return; }
+      for (const p of args) {
+        const r = PT.vfs.read(p);
+        if (r.err) ctx.printError("cat: " + U.esc(p) + ": " + r.err);
+        else ctx.println(U.esc(r.content.replace(/\n$/, "")));
+      }
+    } });
+
+  register({ name: "tree", group: "shell", usage: "tree [path]", desc: "list contents as a tree.",
+    async run(ctx, args) {
+      const start = args[0] || ".";
+      if (!PT.vfs.isDir(start)) { ctx.printError("tree: " + U.esc(start) + ": not a directory"); return; }
+      const lines = [];
+      (function walk(path, prefix) {
+        const es = (PT.vfs.list(path).entries || []).filter((e) => e.name[0] !== ".");
+        es.forEach((e, i) => {
+          const last = i === es.length - 1;
+          lines.push(prefix + (last ? "└── " : "├── ") + (e.node.type === "dir" ? e.name + "/" : e.name));
+          if (e.node.type === "dir") walk(path.replace(/\/$/, "") + "/" + e.name, prefix + (last ? "    " : "│   "));
+        });
+      })(PT.vfs.norm(start), "");
+      ctx.println('<span class="c-accent">' + U.esc(PT.vfs.norm(start)) + "</span>");
+      if (lines.length) ctx.println(U.esc(lines.join("\n")));
+    } });
+
+  register({ name: "mkdir", group: "shell", usage: "mkdir <dir>", desc: "make a directory.",
+    async run(ctx, args) { if (!args[0]) { ctx.printError("usage: mkdir &lt;dir&gt;"); return; } const r = PT.vfs.mkdir(args[0]); if (r.err) ctx.printError("mkdir: " + U.esc(args[0]) + ": " + r.err); } });
+
+  register({ name: "touch", group: "shell", usage: "touch <file>", desc: "create an empty file.",
+    async run(ctx, args) { if (!args[0]) { ctx.printError("usage: touch &lt;file&gt;"); return; } const r = PT.vfs.touch(args[0]); if (r.err) ctx.printError("touch: " + U.esc(args[0]) + ": " + r.err); } });
+
+  register({ name: "rm", group: "shell", usage: "rm <file>", desc: "remove a file or directory.",
+    async run(ctx, args) {
+      const t = args.filter((a) => a[0] !== "-");
+      if (!t[0]) { ctx.printError("usage: rm &lt;file&gt;"); return; }
+      for (const p of t) { const r = PT.vfs.rm(p); if (r.err) ctx.printError("rm: " + U.esc(p) + ": " + r.err); }
+    } });
+
+  register({ name: "id", group: "shell", usage: "id", desc: "print user identity.",
+    async run(ctx) { ctx.println("uid=1000(guest) gid=1000(guest) groups=1000(guest),1001(games)"); } });
+
+  register({ name: "groups", group: "shell", usage: "groups", desc: "print group memberships.",
+    async run(ctx) { ctx.println("guest games players"); } });
+
+  register({ name: "env", aliases: ["printenv"], group: "shell", usage: "env", desc: "print the environment.",
+    async run(ctx) {
+      const e = PT.env;
+      [["USER", e.user], ["HOME", PT.vfs.HOME], ["SHELL", "/bin/" + e.shell], ["HOSTNAME", e.host],
+        ["TERM", "arkeus-256color"], ["PWD", PT.vfs.cwd()], ["LANG", "en_US.UTF-8"]].forEach((kv) =>
+        ctx.println(U.esc(kv[0]) + "=" + U.esc(String(kv[1]))));
+    } });
+
+  register({ name: "which", group: "shell", usage: "which <cmd>", desc: "locate a command.",
+    async run(ctx, args) {
+      if (!args[0]) { ctx.printError("usage: which &lt;cmd&gt;"); return; }
+      const c = PT.commands.resolve(args[0]);
+      ctx.println(c ? "/bin/" + U.esc(args[0]) : '<span class="c-dim">' + U.esc(args[0]) + " not found</span>");
     } });
 
   register({ name: "sudo", group: "fun", usage: "sudo <command>", desc: "you are not root.",
@@ -708,13 +771,13 @@ window.PTerm = window.PTerm || {};
     } });
 
   register({ name: "motd", group: "fun", usage: "motd", desc: "message of the day.",
-    async run(ctx) { ctx.println(U.esc(FILES["/etc/motd"])); } });
+    async run(ctx) { const r = PT.vfs.read("/etc/motd"); ctx.println(U.esc((r.content || "").replace(/\n$/, ""))); } });
 
   register({ name: "exit", aliases: ["quit"], group: "fun", usage: "exit", desc: "there is no escape.",
     async run(ctx) {
       ctx.println('<span class="c-dim">logout</span>');
       await U.sleep(400);
-      ctx.println("there is no exit from PTerm. only more games. try " + '<span class="c-accent">ls</span>' + ".");
+      ctx.println("there is no exit from Arkeus. only more games. try " + '<span class="c-accent">ls</span>' + ".");
     } });
 
   register({
@@ -843,7 +906,7 @@ window.PTerm = window.PTerm || {};
 
   register({ name: "ping", group: "fun", usage: "ping <host>", desc: "pretend to ping a host.",
     async run(ctx, args) {
-      const host = args[0] || "portal.pterm";
+      const host = args[0] || "aegis.arkeus";
       ctx.println("PING " + U.esc(host) + " (127.0.0.1): 56 data bytes");
       for (let i = 0; i < 4; i++) {
         await U.sleep(280);
@@ -857,10 +920,10 @@ window.PTerm = window.PTerm || {};
     async run(ctx) {
       ctx.println('<span class="c-dim">  PID USER      %CPU %MEM  COMMAND</span>');
       const procs = [
-        ["1", "root", "0.0", "0.1", "/sbin/portal-init"],
-        ["7", "guest", "0.3", "0.4", "psh"],
+        ["1", "root", "0.0", "0.1", "/sbin/aegis-init"],
+        ["7", "guest", "0.3", "0.4", "ash"],
         ["42", "guest", "1.2", "2.1", "gamed --catalogs=" + PT.catalog.SOURCES.length],
-        ["108", "guest", "0.7", "1.4", "portald --overlay"],
+        ["108", "guest", "0.7", "1.4", "aegisd --overlay"],
         ["256", "guest", (Math.random() * 20).toFixed(1), "3.3", "fastfetch"],
         ["777", "guest", "0.0", "0.2", "coffee-daemon"],
       ];
@@ -870,7 +933,7 @@ window.PTerm = window.PTerm || {};
 
   register({ name: "weather", group: "fun", usage: "weather", desc: "today's forecast.",
     async run(ctx) {
-      ctx.println('<span class="c-accent">portal:</span> cloudy with a 100% chance of games. ' +
+      ctx.println('<span class="c-accent">aegis:</span> cloudy with a 100% chance of games. ' +
         "UV index: " + U.randInt(11) + ". you should be doing homework.");
     } });
 
@@ -900,14 +963,14 @@ window.PTerm = window.PTerm || {};
         ctx.appendToLast(' <span class="c-accent">ok</span>');
       }
       await U.sleep(200);
-      ctx.println('<span class="c-warn b">ACCESS GRANTED</span> <span class="c-dim">(kidding. this is just PTerm.)</span>');
+      ctx.println('<span class="c-warn b">ACCESS GRANTED</span> <span class="c-dim">(kidding. this is just Arkeus.)</span>');
     } });
 
   register({ name: "logo", aliases: ["distros", "setlogo"], group: "system", usage: "logo [name|random|reset]",
     desc: "choose & save the fastfetch logo.",
     async run(ctx, args) {
       const names = PT.ascii.distroNames();
-      const cur = U.store.get("fetchLogo") || "pterm";
+      const cur = U.store.get("fetchLogo") || "arkeus";
       let name = (args[0] || "").toLowerCase();
       if (!name) {
         ctx.println('<span class="c-dim">saved logo:</span> <span class="c-accent">' + cur + "</span>");
@@ -917,7 +980,7 @@ window.PTerm = window.PTerm || {};
           '<span class="c-dim">, preview one with</span> <span class="c-accent">fastfetch &lt;name&gt;</span>');
         return;
       }
-      if (name === "reset") name = "pterm";
+      if (name === "reset") name = "arkeus";
       if (name === "random") name = U.pick(names);
       if (names.indexOf(name) < 0) { ctx.printError('unknown logo "' + U.esc(name) + '". options: ' + names.join(", ")); return; }
       U.store.set("fetchLogo", name);
@@ -974,13 +1037,14 @@ window.PTerm = window.PTerm || {};
 
   register({ name: "passwd", group: "system", usage: "passwd", desc: "change the login password.",
     async run(ctx) {
+      if (!PT.auth.available()) { ctx.printError("passwd requires a secure context (https)."); return; }
       const n1 = await ctx.readLine({ prompt: '<span class="c-dim">New password:</span> ', mask: true });
       if (!n1) { ctx.printError("password unchanged (empty)."); return; }
+      if (n1.length < 8) ctx.printWarn("short passwords are weaker against brute force -- 8+ characters recommended.");
       const n2 = await ctx.readLine({ prompt: '<span class="c-dim">Retype new password:</span> ', mask: true });
       if (n1 !== n2) { ctx.printError("passwords do not match. unchanged."); return; }
-      U.store.set("password", n1);
-      ctx.println('<span class="c-ok">password updated.</span> <span class="c-dim">applies next time you</span> ' +
-        '<span class="c-accent">lock</span> <span class="c-dim">or reload.</span>');
+      await PT.auth.setPassword(n1);
+      ctx.println('<span class="c-ok">password updated.</span> <span class="c-dim">stored as a salted PBKDF2/AES-GCM token -- never in plaintext.</span>');
     } });
 
   register({ name: "lock", aliases: ["logout"], group: "system", usage: "lock", desc: "lock the terminal (require the password).",
@@ -1017,7 +1081,7 @@ window.PTerm = window.PTerm || {};
   register({ name: "df", group: "fun", usage: "df", desc: "disk usage.",
     async run(ctx) {
       ctx.println('<span class="c-dim">Filesystem      Size  Used Avail Use% Mounted on</span>');
-      ctx.println("/dev/portal0    9.0P  8.9P   64K 100% /");
+      ctx.println("/dev/aegis0    9.0P  8.9P   64K 100% /");
       ctx.println("gamefs      " + String((PT.catalog.all().length || "?")).padStart(8) + " games   -   -  /mnt/games");
       ctx.println("tmpfs           1.0G     0  1.0G   0% /dev/coffee");
     } });
@@ -1119,4 +1183,4 @@ window.PTerm = window.PTerm || {};
   };
 
   PT.commands = commands;
-})(window.PTerm);
+})(window.Arkeus);

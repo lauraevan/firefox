@@ -2,5 +2,5 @@
   <rect width="64" height="64" rx="10" fill="#000000"/>
   <rect x="4" y="4" width="56" height="56" rx="8" fill="none" stroke="#555555" stroke-width="2"/>
   <text x="32" y="46" font-family="monospace" font-size="42" font-weight="700"
-        text-anchor="middle" fill="#ffffff">P</text>
+        text-anchor="middle" fill="#ffffff">A</text>
 </svg>

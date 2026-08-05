@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="PTerm - a terminal-based game launcher.">
-  <title>PTerm</title>
+  <meta name="description" content="Arkeus - a terminal.">
+  <title>Arkeus</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/pterm.css">
 </head>
@@ -36,13 +36,9 @@
 
   <div class="pt-crt" aria-hidden="true"></div>
 
-  <script src="js/util.js" defer></script>
-  <script src="js/ascii.js" defer></script>
+  <!-- Deployed code is the obfuscated bundle (built from js/*.js by build.js).
+       catalogs.js is game data (public), loaded separately. -->
   <script src="js/catalogs.js" defer></script>
-  <script src="js/catalog.js" defer></script>
-  <script src="js/launcher.js" defer></script>
-  <script src="js/commands.js" defer></script>
-  <script src="js/terminal.js" defer></script>
-  <script src="js/boot.js" defer></script>
+  <script src="dist/arkeus.min.js" defer></script>
 </body>
 </html>

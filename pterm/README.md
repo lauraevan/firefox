@@ -1,29 +1,54 @@
-# PTerm
+# Arkeus
 
-A terminal-based game launcher. PTerm boots into a fake Linux terminal with an
-ASCII `P` logo and launches browser games from public catalogs — but you have to
-_type_ for them. No menus, no big play buttons. You type the name, you get the
-game.
+A terminal that launches browser games. Arkeus boots into a fake Linux shell
+(ASCII `A` logo), gates behind a password, and launches games from public
+catalogs — but you have to _type_ for them. It also has a small real filesystem
+(`ls`, `cd`, `cat`, `tree`, …) so it feels like an actual terminal.
 
 ```
-guest@pterm:~$ cookie clicker
+guest@arkeus:~$ cookie clicker
 ```
 
-That's it — just type a game name (no quotes, no source needed). Prefer the
-ceremony? `play cookie clicker` and `npm start "Cookie Clicker" S=GN-Math` still
-work. PTerm starts in a clean black-and-white theme; `theme green` (or `amber`,
-`matrix`, `ice`) and `crt on` bring back the retro glow.
+Just type a game name (no quotes, no source needed). Prefer the ceremony?
+`play cookie clicker` and `npm start "Cookie Clicker" S=GN-Math` still work.
+Arkeus starts black-and-white; `theme green`/`amber`/`matrix`/`ice` + `crt on`
+bring back the glow.
 
-**Login:** PTerm opens with a password gate. The first-run password is `portal`
-(the login screen says so). Change it with `passwd`, re-lock with `lock`. This is
-a client-side, on-theme soft gate — not real security.
+> The project folder is still named `pterm/` (so existing deploy paths keep
+> working) but the product is **Arkeus**.
+
+## Security — and its honest limits
+
+The whole app is **client-side**, so nothing running in the browser can be made
+"unbreakable": a determined person can always read what the browser executes.
+What Arkeus *can* and does do — aimed squarely at "someone reads the source and
+steals the password":
+
+- **No password is ever stored, anywhere.** Login uses Web Crypto: a
+  `PBKDF2-SHA256` (210k iterations) key derived from the typed password must
+  decrypt a salted `AES-256-GCM` verification token. The source and
+  `localStorage` hold only the token + salt — **there is no password to find**.
+  `passwd` re-encrypts a fresh token; the plaintext never touches storage.
+- **The deployed code is obfuscated.** `index.html` loads
+  [`dist/arkeus.min.js`](dist/arkeus.min.js) (built from `js/*.js` by
+  [`build.js`](build.js)) — identifiers mangled, strings base64-packed — so
+  casual "view source" gets nothing readable.
+
+What this does **not** do (and can't, client-side): stop someone from *bypassing*
+the gate in devtools, or brute-forcing a **weak** password offline from the
+token. So: **change the default immediately with `passwd` and pick a strong
+password.** (The first-run default is `arkeus`, and this repo being public means
+the default token is guessable — your own strong password lives only in your
+browser, never in the repo.) Rebuild the bundle after any source change:
+`npm install javascript-obfuscator && node build.js`.
 
 ## Running it
 
-PTerm is a static site — plain HTML/CSS/JS, no build step, no dependencies.
+Arkeus is a static site — HTML/CSS/JS. The only build step is the obfuscated
+bundle (`node build.js`); the committed `dist/arkeus.min.js` is ready to serve.
+Web Crypto needs a **secure context**, so use `https://` or `http://localhost`.
 
-- **Locally:** serve the folder over HTTP (catalogs are fetched with `fetch()`,
-  which does not work from `file://`):
+- **Locally:** serve over HTTP (localhost counts as secure):
   ```
   cd pterm
   python3 -m http.server 8099
@@ -67,8 +92,9 @@ Type `help` in the terminal for the full list. Highlights:
 | `retry` | relaunch the last game, trying other mirrors |
 | `fastfetch [distro]` / `logo` | system info with a saved distro logo (arch, ubuntu, mint, ...) |
 | `diag` | test connectivity to each source / CDN |
-| `passwd` / `lock` | change the password / re-lock the terminal |
-| `df`, `free`, `su`, `rev`, `yes` | more Linux flavor |
+| `passwd` / `lock` | change the encrypted password / re-lock the terminal |
+| `ls`, `cd`, `pwd`, `cat`, `tree`, `mkdir`, `touch`, `rm` | the (in-memory) filesystem |
+| `id`, `groups`, `env`, `which`, `df`, `free`, `su`, `rev`, `yes` | more Linux flavor |
 | `fastfetch` / `neofetch` | system info + logo, the cool way |
 | `version`, `banner`, `about` | who/what/which |
 | `theme [green\|amber\|matrix\|ice\|mono]`, `crt`, `colors` | looks |

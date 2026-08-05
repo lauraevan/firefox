@@ -1,5 +1,5 @@
-/* PTerm - ASCII art and banners */
-window.PTerm = window.PTerm || {};
+/* Arkeus - ASCII art and banners */
+window.Arkeus = window.Arkeus || {};
 
 (function (PT) {
   "use strict";
@@ -8,28 +8,27 @@ window.PTerm = window.PTerm || {};
 
   /* Full "PTERM" wordmark (ANSI Shadow style). */
   ascii.banner = [
-    " ██████╗ ████████╗███████╗██████╗ ███╗   ███╗",
-    " ██╔══██╗╚══██╔══╝██╔════╝██╔══██╗████╗ ████║",
-    " ██████╔╝   ██║   █████╗  ██████╔╝██╔████╔██║",
-    " ██╔═══╝    ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║",
-    " ██║        ██║   ███████╗██║  ██║██║ ╚═╝ ██║",
-    " ╚═╝        ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝",
+    " █████╗ ██████╗ ██╗  ██╗███████╗██╗   ██╗███████╗",
+    "██╔══██╗██╔══██╗██║ ██╔╝██╔════╝██║   ██║██╔════╝",
+    "███████║██████╔╝█████╔╝ █████╗  ██║   ██║███████╗",
+    "██╔══██║██╔══██╗██╔═██╗ ██╔══╝  ██║   ██║╚════██║",
+    "██║  ██║██║  ██║██║  ██╗███████╗╚██████╔╝███████║",
+    "╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚══════╝",
   ].join("\n");
 
   /* Standalone block "P" used by fastfetch. */
   ascii.pLogo = [
-    "        ",
-    "  ██████╗ ",
+    "         ",
+    "   █████╗ ",
     "  ██╔══██╗",
-    "  ██████╔╝",
-    "  ██╔═══╝ ",
-    "  ██║     ",
-    "  ██║     ",
-    "  ╚═╝     ",
-    "        ",
+    "  ███████║",
+    "  ██╔══██║",
+    "  ██║  ██║",
+    "  ╚═╝  ╚═╝",
+    "         ",
   ];
 
-  /* Big boot P (drawn with a portal ring around it). */
+  /* Big boot P (drawn with a aegis ring around it). */
   ascii.bootP = [
     "            .:=+**+=:.            ",
     "        .=*#%@@@@@@@%#*=.         ",
@@ -49,14 +48,13 @@ window.PTerm = window.PTerm || {};
 
   /* Distro logos for fastfetch. Recognizable, compact, monochrome-friendly. */
   ascii.distros = {
-    "pterm": [
-      "  ██████╗ ",
+    "arkeus": [
+      "   █████╗ ",
       "  ██╔══██╗",
-      "  ██████╔╝",
-      "  ██╔═══╝ ",
-      "  ██║     ",
-      "  ██║     ",
-      "  ╚═╝     "
+      "  ███████║",
+      "  ██╔══██║",
+      "  ██║  ██║",
+      "  ╚═╝  ╚═╝"
     ],
     "arch": [
       "                   -`",
@@ -310,7 +308,7 @@ window.PTerm = window.PTerm || {};
   ascii.distroNames = function () { return Object.keys(ascii.distros); };
 
   ascii.logo = function (name) {
-    return ascii.distros[String(name || "").toLowerCase()] || ascii.distros.pterm;
+    return ascii.distros[String(name || "").toLowerCase()] || ascii.distros.arkeus;
   };
 
   ascii.render = function (linesOrStr, cls) {
@@ -319,4 +317,4 @@ window.PTerm = window.PTerm || {};
   };
 
   PT.ascii = ascii;
-})(window.PTerm);
+})(window.Arkeus);

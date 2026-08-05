@@ -1,5 +1,5 @@
-/* PTerm - game catalog: sources, adapters, normalization, search */
-window.PTerm = window.PTerm || {};
+/* Arkeus - game catalog: sources, adapters, normalization, search */
+window.Arkeus = window.Arkeus || {};
 
 (function (PT) {
   "use strict";
@@ -216,7 +216,7 @@ window.PTerm = window.PTerm || {};
     return data;
   }
 
-  /* Normalize from the embedded snapshot (window.PTerm.DATA), no network. */
+  /* Normalize from the embedded snapshot (window.Arkeus.DATA), no network. */
   function fromEmbedded(source) {
     const D = PT.DATA;
     if (!D || !D[source.key]) return null;
@@ -465,4 +465,4 @@ window.PTerm = window.PTerm || {};
   };
 
   PT.catalog = catalog;
-})(window.PTerm);
+})(window.Arkeus);
