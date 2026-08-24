@@ -230,6 +230,9 @@ panel-item::part(button) {
 @import '../components/DiscoveryStreamComponents/PersonalizedCard/PersonalizedCard';
 @import '../components/MessageWrapper/MessageWrapper';
 
+// Safari-style Start Page
+@import './safari';
+
 // Nova Component Styles
 // @nova-cleanup(merge-styles): After ship, remove the CSS swap in AboutNewTabChild.sys.mjs
 @import './nova/tokens';

@@ -29,6 +29,9 @@ const ENABLEMENT_PREFS = new Set([
   PRIVACY_ENTRY.enabledPref,
   PRIVACY_ENTRY.systemEnabledPref,
   "trainhopConfig",
+  // The Safari-style Start Page's Privacy Report reuses this count.
+  "safari.enabled",
+  "safari.showPrivacyReport",
 ]);
 
 /**
@@ -39,11 +42,20 @@ const ENABLEMENT_PREFS = new Set([
 export class PrivacyFeed {
   get enabled() {
     const prefs = this.store.getState()?.Prefs.values;
+    // The Safari-style Start Page surfaces this same daily count in its Privacy
+    // Report, so keep the feed running when that is enabled even if the Privacy
+    // widget itself is turned off.
+    const safariPrivacy =
+      !!prefs?.["safari.enabled"] &&
+      prefs?.["safari.showPrivacyReport"] !== false;
     // Share the registry enablement logic the UI uses so trainhop rollouts
     // (trainhopConfig.widgets.privacyEnabled) start the feed even when the
     // system pref defaults false. Otherwise the widget renders but the counter
     // stays stuck at the empty state.
-    return isWidgetEnabled(PRIVACY_ENTRY, prefs, prefs?.[PREF_WIDGETS_ENABLED]);
+    return (
+      safariPrivacy ||
+      isWidgetEnabled(PRIVACY_ENTRY, prefs, prefs?.[PREF_WIDGETS_ENABLED])
+    );
   }
 
   /**

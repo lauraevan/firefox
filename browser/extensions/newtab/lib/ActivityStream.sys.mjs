@@ -339,6 +339,34 @@ export const PREFS_CONFIG = new Map([
     },
   ],
   [
+    "safari.enabled",
+    {
+      title: "Render the Safari-style Start Page instead of the default layout",
+      value: true,
+    },
+  ],
+  [
+    "safari.showFavorites",
+    {
+      title: "Safari Start Page: show the Favorites section",
+      value: true,
+    },
+  ],
+  [
+    "safari.showFrequentlyVisited",
+    {
+      title: "Safari Start Page: show the Frequently Visited section",
+      value: true,
+    },
+  ],
+  [
+    "safari.showPrivacyReport",
+    {
+      title: "Safari Start Page: show the Privacy Report card",
+      value: true,
+    },
+  ],
+  [
     "hideTopSitesTitle",
     {
       title:

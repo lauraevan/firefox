@@ -13,6 +13,7 @@ import { BaseContext } from "content-src/lib/BaseContext";
 import React, { useState, useEffect } from "react";
 import { Search } from "content-src/components/Search/Search";
 import { TopSites } from "content-src/components/TopSites/TopSites";
+import { SafariStartPage } from "content-src/components/Safari/SafariStartPage";
 import { Sections } from "content-src/components/Sections/Sections";
 import { Logo } from "content-src/components/Logo/Logo";
 import { Weather } from "content-src/components/Weather/Weather";
@@ -821,6 +822,17 @@ export class BaseContent extends React.PureComponent {
   // eslint-disable-next-line max-statements, complexity
   render() {
     const { props } = this;
+
+    // Safari-style Start Page replaces the entire new tab layout when enabled.
+    // It is a self-contained component tree fed by the real Redux store.
+    if (props.Prefs.values["safari.enabled"]) {
+      return (
+        <ErrorBoundary className="base-content-fallback">
+          <SafariStartPage />
+        </ErrorBoundary>
+      );
+    }
+
     const { App, DiscoveryStream } = props;
     const { initialized, customizeMenuVisible } = App;
     const prefs = props.Prefs.values;

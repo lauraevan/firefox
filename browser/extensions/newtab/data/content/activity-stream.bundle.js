@@ -26471,6 +26471,455 @@ class Search_Search extends (external_React_default()).PureComponent {
     }));
   }
 }
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariSection.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function SafariSection({
+  title,
+  children
+}) {
+  return /*#__PURE__*/external_React_default().createElement("section", {
+    className: "safari-section"
+  }, title ? /*#__PURE__*/external_React_default().createElement("h2", {
+    className: "safari-section__title"
+  }, title) : null, children);
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariTile.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function hostnameFor(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch (e) {
+    return url || "";
+  }
+}
+function labelFor(link) {
+  return link.label || link.title || link.hostname || hostnameFor(link.url);
+}
+
+// Apple-style palette for iconless sites; all read well with white text.
+const LETTER_PALETTE = ["#ff3b30", "#ff9500", "#ff2d55", "#af52de", "#5856d6", "#007aff", "#30b0c7", "#34c759", "#8e8e93"];
+function colorForKey(key) {
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash << 5) - hash + key.charCodeAt(i);
+    hash |= 0;
+  }
+  return LETTER_PALETTE[Math.abs(hash) % LETTER_PALETTE.length];
+}
+
+// Decide how to paint the icon square from the real Top Sites `link` fields.
+// Safari renders the site icon (or a letter fallback) centered on an elevated
+// rounded square, so we never use full-bleed screenshots here.
+function resolveIcon(link) {
+  const iconUrl = link.tippyTopIcon || link.favicon || link.iconUri || null;
+  if (link.searchTopSite && link.tippyTopIcon) {
+    return {
+      kind: "image",
+      url: link.tippyTopIcon,
+      backgroundColor: link.backgroundColor
+    };
+  }
+  if (iconUrl) {
+    return {
+      kind: "image",
+      url: iconUrl,
+      backgroundColor: null
+    };
+  }
+  return {
+    kind: "letter"
+  };
+}
+function SafariTile({
+  link,
+  onOpen
+}) {
+  const label = labelFor(link);
+  const icon = resolveIcon(link);
+  const letter = (label || "?").trim().charAt(0).toUpperCase() || "?";
+  const handleClick = event => {
+    if (onOpen) {
+      onOpen(event, link);
+    }
+  };
+  return /*#__PURE__*/external_React_default().createElement("a", {
+    className: "safari-tile",
+    href: link.url,
+    title: label,
+    onClick: handleClick,
+    draggable: "false"
+  }, /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-tile__icon"
+  }, icon.kind === "image" ? /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-tile__img",
+    style: {
+      backgroundImage: `url("${icon.url}")`,
+      ...(icon.backgroundColor ? {
+        backgroundColor: icon.backgroundColor
+      } : null)
+    }
+  }) : /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-tile__letter",
+    "aria-hidden": "true",
+    style: {
+      backgroundColor: colorForKey(label || link.url || "?")
+    }
+  }, letter)), /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-tile__label"
+  }, label));
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/icons.jsx
+function icons_extends() { return icons_extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, icons_extends.apply(null, arguments); }
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+// Original SVG glyphs drawn to approximate the geometry and stroke weight of
+// the corresponding SF Symbols. currentColor is used so each icon inherits the
+// surrounding text color and adapts to light/dark automatically.
+
+function ShieldIcon(props) {
+  return /*#__PURE__*/external_React_default().createElement("svg", icons_extends({
+    viewBox: "0 0 24 24",
+    width: "24",
+    height: "24",
+    "aria-hidden": "true"
+  }, props), /*#__PURE__*/external_React_default().createElement("path", {
+    d: "M12 2.75c2.2 1.3 4.4 2 6.75 2.1.3 0 .5.24.5.55v6.1c0 3.9-2.5 7.2-7.03 9.05a.6.6 0 0 1-.44 0C7.25 20.7 4.75 17.4 4.75 13.5V5.4c0-.31.2-.55.5-.55 2.35-.1 4.55-.8 6.75-2.1Z",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.6",
+    strokeLinejoin: "round"
+  }), /*#__PURE__*/external_React_default().createElement("path", {
+    d: "m9 12.2 2.1 2.1L15.2 10",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.7",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }));
+}
+function ChevronRightIcon(props) {
+  return /*#__PURE__*/external_React_default().createElement("svg", icons_extends({
+    viewBox: "0 0 24 24",
+    width: "16",
+    height: "16",
+    "aria-hidden": "true"
+  }, props), /*#__PURE__*/external_React_default().createElement("path", {
+    d: "m9.5 5.5 6.2 6.5-6.2 6.5",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }));
+}
+function AdjustmentsIcon(props) {
+  return /*#__PURE__*/external_React_default().createElement("svg", icons_extends({
+    viewBox: "0 0 24 24",
+    width: "18",
+    height: "18",
+    "aria-hidden": "true"
+  }, props), /*#__PURE__*/external_React_default().createElement("g", {
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.7",
+    strokeLinecap: "round"
+  }, /*#__PURE__*/external_React_default().createElement("line", {
+    x1: "4",
+    y1: "8",
+    x2: "20",
+    y2: "8"
+  }), /*#__PURE__*/external_React_default().createElement("line", {
+    x1: "4",
+    y1: "16",
+    x2: "20",
+    y2: "16"
+  }), /*#__PURE__*/external_React_default().createElement("circle", {
+    cx: "9",
+    cy: "8",
+    r: "2.4",
+    fill: "var(--safari-popover-bg, #fff)"
+  }), /*#__PURE__*/external_React_default().createElement("circle", {
+    cx: "15",
+    cy: "16",
+    r: "2.4",
+    fill: "var(--safari-popover-bg, #fff)"
+  })));
+}
+function CheckIcon(props) {
+  return /*#__PURE__*/external_React_default().createElement("svg", icons_extends({
+    viewBox: "0 0 16 16",
+    width: "14",
+    height: "14",
+    "aria-hidden": "true"
+  }, props), /*#__PURE__*/external_React_default().createElement("path", {
+    d: "m3.5 8.5 3 3 6-7",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }));
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariPrivacyCard.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+
+// `report.trackersBlocked` is a real count sourced from PrivacyMetricsService
+// (the same tracking-protection data behind about:protections). The card is
+// only rendered when a real number is available, so the figure is never
+// fabricated. The count is a per-day total, so the copy says "Today".
+function SafariPrivacyCard({
+  report,
+  onOpen
+}) {
+  const count = report?.trackersBlocked || 0;
+  return /*#__PURE__*/external_React_default().createElement("a", {
+    className: "safari-privacy-card",
+    href: "about:protections",
+    onClick: onOpen
+  }, /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-privacy-card__glyph"
+  }, /*#__PURE__*/external_React_default().createElement(ShieldIcon, null)), /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-privacy-card__text"
+  }, "Today, Safari has prevented ", /*#__PURE__*/external_React_default().createElement("strong", null, count.toLocaleString()), " ", count === 1 ? "tracker" : "trackers", " from profiling you."), /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-privacy-card__chevron",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/external_React_default().createElement(ChevronRightIcon, null)));
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariCustomizePopover.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+function CheckRow({
+  label,
+  checked,
+  onToggle
+}) {
+  return /*#__PURE__*/external_React_default().createElement("button", {
+    type: "button",
+    className: `safari-customize__row${checked ? " is-checked" : ""}`,
+    role: "menuitemcheckbox",
+    "aria-checked": checked,
+    onClick: onToggle
+  }, /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-customize__check"
+  }, checked ? /*#__PURE__*/external_React_default().createElement(CheckIcon, null) : null), /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-customize__label"
+  }, label));
+}
+
+// Each toggle is bound to a real, persisted preference through `onSetPref`, so
+// the popover controls actual browser state rather than decorative switches.
+function SafariCustomizePopover({
+  sections,
+  onSetPref
+}) {
+  const [open, setOpen] = (0,external_React_namespaceObject.useState)(false);
+  const wrapperRef = (0,external_React_namespaceObject.useRef)(null);
+  (0,external_React_namespaceObject.useEffect)(() => {
+    if (!open) {
+      return undefined;
+    }
+    const onDocClick = event => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    const onKey = event => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+  return /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-customize",
+    ref: wrapperRef
+  }, open ? /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-customize__popover",
+    role: "menu"
+  }, sections.map(item => /*#__PURE__*/external_React_default().createElement(CheckRow, {
+    key: item.pref,
+    label: item.label,
+    checked: item.value,
+    onToggle: () => onSetPref(item.pref, !item.value)
+  }))) : null, /*#__PURE__*/external_React_default().createElement("button", {
+    type: "button",
+    className: `safari-customize__button${open ? " is-open" : ""}`,
+    "aria-label": "Edit start page",
+    "aria-expanded": open,
+    onClick: () => setOpen(v => !v)
+  }, /*#__PURE__*/external_React_default().createElement(AdjustmentsIcon, null)));
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariStartPageInner.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+
+
+
+function Grid({
+  links,
+  onOpen
+}) {
+  return /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-grid"
+  }, links.map((link, i) => /*#__PURE__*/external_React_default().createElement(SafariTile, {
+    key: link.guid || link.url || i,
+    link: link,
+    onOpen: onOpen
+  })));
+}
+
+// Presentational start page. Deliberately free of Redux so it can be rendered
+// directly from a preview/test harness with representative data. All browser
+// state arrives via props; the connected container lives in SafariStartPage.jsx.
+function SafariStartPageInner(props) {
+  const {
+    favorites = [],
+    frequentlyVisited = [],
+    showFavorites = true,
+    showFrequentlyVisited = true,
+    showPrivacyReport = true,
+    privacyReport = null,
+    wallpaper = null,
+    onOpenLink,
+    onSetPref = () => {}
+  } = props;
+  const hasPrivacy = showPrivacyReport && privacyReport && typeof privacyReport.trackersBlocked === "number";
+  const customizeSections = [{
+    label: "Favorites",
+    pref: "safari.showFavorites",
+    value: showFavorites
+  }, {
+    label: "Frequently Visited",
+    pref: "safari.showFrequentlyVisited",
+    value: showFrequentlyVisited
+  }, {
+    label: "Privacy Report",
+    pref: "safari.showPrivacyReport",
+    value: showPrivacyReport
+  }];
+  return /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-startpage"
+  }, /*#__PURE__*/external_React_default().createElement("div", {
+    className: `safari-startpage__background${wallpaper?.url ? " has-wallpaper" : ""}`,
+    style: wallpaper?.url ? {
+      backgroundImage: `url("${wallpaper.url}")`
+    } : undefined
+  }), /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-startpage__scroll"
+  }, /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-startpage__content"
+  }, showFavorites && favorites.length > 0 ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
+    title: "Favorites"
+  }, /*#__PURE__*/external_React_default().createElement(Grid, {
+    links: favorites,
+    onOpen: onOpenLink
+  })) : null, showFrequentlyVisited && frequentlyVisited.length > 0 ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
+    title: "Frequently Visited"
+  }, /*#__PURE__*/external_React_default().createElement(Grid, {
+    links: frequentlyVisited,
+    onOpen: onOpenLink
+  })) : null, hasPrivacy ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
+    title: "Privacy Report"
+  }, /*#__PURE__*/external_React_default().createElement(SafariPrivacyCard, {
+    report: privacyReport
+  })) : null)), /*#__PURE__*/external_React_default().createElement(SafariCustomizePopover, {
+    sections: customizeSections,
+    onSetPref: onSetPref
+  }));
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariStartPage.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+
+
+// Split real Top Sites rows into Safari's two buckets. When the user has pinned
+// sites they become Favorites and everything else is Frequently Visited; on a
+// fresh profile with nothing pinned, the frecency-ranked sites fill Favorites
+// so the page is never empty.
+function partitionTopSites(rows = []) {
+  const usable = rows.filter(row => row && row.url && !row.isSponsoredTopSite);
+  const pinned = usable.filter(row => row.isPinned);
+  const unpinned = usable.filter(row => !row.isPinned);
+  if (pinned.length) {
+    return {
+      favorites: pinned,
+      frequentlyVisited: unpinned
+    };
+  }
+  return {
+    favorites: unpinned,
+    frequentlyVisited: []
+  };
+}
+
+// Real tracker-blocking data reuses the existing PrivacyFeed / PrivacyWidget
+// pipeline (PrivacyMetricsService), so the count is genuine and never faked.
+function privacyReportFrom(state) {
+  const widget = state.PrivacyWidget;
+  if (!widget?.initialized || typeof widget.trackersToday !== "number") {
+    return null;
+  }
+  return {
+    trackersBlocked: widget.trackersToday,
+    lastUpdated: widget.lastUpdated
+  };
+}
+function mapStateToProps(state) {
+  const prefs = state.Prefs.values;
+  const {
+    favorites,
+    frequentlyVisited
+  } = partitionTopSites(state.TopSites?.rows);
+  const showPrivacyReport = prefs["safari.showPrivacyReport"] !== false;
+  return {
+    favorites,
+    frequentlyVisited,
+    showFavorites: prefs["safari.showFavorites"] !== false,
+    showFrequentlyVisited: prefs["safari.showFrequentlyVisited"] !== false,
+    showPrivacyReport,
+    privacyReport: showPrivacyReport ? privacyReportFrom(state) : null
+  };
+}
+function mapDispatchToProps(dispatch) {
+  return {
+    onSetPref: (name, value) => dispatch(actionCreators.SetPref(name, value))
+  };
+}
+const SafariStartPage = (0,external_ReactRedux_namespaceObject.connect)(mapStateToProps, mapDispatchToProps)(SafariStartPageInner);
 ;// CONCATENATED MODULE: ./content-src/components/Weather/Weather.jsx
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -27999,6 +28448,7 @@ function Base_extends() { return Base_extends = Object.assign ? Object.assign.bi
 
 
 
+
 const Base_VISIBLE = "visible";
 const Base_VISIBILITY_CHANGE_EVENT = "visibilitychange";
 // Minimum scroll distance in pixels to record a scroll telemetry event.
@@ -28645,6 +29095,14 @@ class BaseContent extends (external_React_default()).PureComponent {
     const {
       props
     } = this;
+
+    // Safari-style Start Page replaces the entire new tab layout when enabled.
+    // It is a self-contained component tree fed by the real Redux store.
+    if (props.Prefs.values["safari.enabled"]) {
+      return /*#__PURE__*/external_React_default().createElement(ErrorBoundary, {
+        className: "base-content-fallback"
+      }, /*#__PURE__*/external_React_default().createElement(SafariStartPage, null));
+    }
     const {
       App,
       DiscoveryStream

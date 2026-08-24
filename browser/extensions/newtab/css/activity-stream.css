@@ -16520,6 +16520,295 @@ hr {
 }
 
 /* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+.safari-startpage {
+  --safari-font:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --safari-bg: #f7f7f8;
+  --safari-tile-bg: #ffffff;
+  --safari-tile-border: rgba(0, 0, 0, 0.06);
+  --safari-tile-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08), 0 6px 16px rgba(0, 0, 0, 0.05);
+  --safari-label: #1d1d1f;
+  --safari-secondary-label: rgba(60, 60, 67, 0.6);
+  --safari-section-title: #1d1d1f;
+  --safari-hover-bg: rgba(0, 0, 0, 0.05);
+  --safari-card-bg: #ffffff;
+  --safari-accent: #007aff;
+  --safari-popover-bg: rgba(255, 255, 255, 0.82);
+  --safari-tile-size: 84px;
+  --safari-icon-size: 64px;
+  --safari-icon-radius: 16px;
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  background-color: var(--safari-bg);
+  color: var(--safari-label);
+  font-family: var(--safari-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.safari-startpage *,
+.safari-startpage *::before,
+.safari-startpage *::after {
+  box-sizing: border-box;
+}
+.safari-startpage__background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+.safari-startpage__background.has-wallpaper {
+  background-size: cover;
+  background-position: center;
+}
+.safari-startpage__background.has-wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.18));
+}
+.safari-startpage__scroll {
+  position: relative;
+  z-index: 1;
+}
+.safari-startpage__content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 56px 32px 112px;
+}
+.safari-startpage .safari-section {
+  margin-block-end: 44px;
+}
+.safari-startpage .safari-section:last-child {
+  margin-block-end: 0;
+}
+.safari-startpage .safari-section__title {
+  margin: 0 0 18px;
+  padding-inline: 6px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--safari-section-title);
+}
+.safari-startpage .safari-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--safari-tile-size));
+  justify-content: start;
+  column-gap: 20px;
+  row-gap: 24px;
+}
+.safari-startpage .safari-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--safari-tile-size);
+  padding: 8px 2px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--safari-label);
+  transition: background-color 0.15s ease, transform 0.12s ease;
+}
+.safari-startpage .safari-tile:hover {
+  background-color: var(--safari-hover-bg);
+}
+.safari-startpage .safari-tile:active {
+  transform: scale(0.97);
+}
+.safari-startpage .safari-tile__icon {
+  display: grid;
+  place-items: center;
+  width: var(--safari-icon-size);
+  height: var(--safari-icon-size);
+  border-radius: var(--safari-icon-radius);
+  background-color: var(--safari-tile-bg);
+  border: 0.5px solid var(--safari-tile-border);
+  box-shadow: var(--safari-tile-shadow);
+  overflow: hidden;
+  transition: transform 0.15s ease;
+}
+.safari-startpage .safari-tile:hover .safari-startpage .safari-tile__icon {
+  transform: translateY(-1px);
+}
+.safari-startpage .safari-tile__img {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 58%;
+}
+.safari-startpage .safari-tile__letter {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 30px;
+  font-weight: 600;
+  color: #fff;
+}
+.safari-startpage .safari-tile__label {
+  display: -webkit-box;
+  margin-block-start: 8px;
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 400;
+  text-align: center;
+  color: var(--safari-label);
+  max-width: 100%;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+.safari-startpage .safari-privacy-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 640px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background-color: var(--safari-card-bg);
+  border: 0.5px solid var(--safari-tile-border);
+  box-shadow: var(--safari-tile-shadow);
+  text-decoration: none;
+  color: var(--safari-label);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.safari-startpage .safari-privacy-card:hover {
+  transform: translateY(-1px);
+}
+.safari-startpage .safari-privacy-card__glyph {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  color: var(--safari-accent);
+}
+.safari-startpage .safari-privacy-card__text {
+  flex: 1 1 auto;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--safari-label);
+}
+.safari-startpage .safari-privacy-card__text strong {
+  font-weight: 600;
+}
+.safari-startpage .safari-privacy-card__chevron {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--safari-secondary-label);
+}
+.safari-startpage .safari-customize {
+  position: fixed;
+  inset-block-end: 20px;
+  inset-inline-end: 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.safari-startpage .safari-customize__button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0.5px solid var(--safari-tile-border);
+  background-color: var(--safari-card-bg);
+  color: var(--safari-secondary-label);
+  box-shadow: var(--safari-tile-shadow);
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+.safari-startpage .safari-customize__button:hover {
+  color: var(--safari-label);
+  transform: scale(1.05);
+}
+.safari-startpage .safari-customize__button.is-open {
+  color: var(--safari-accent);
+}
+.safari-startpage .safari-customize__popover {
+  min-width: 224px;
+  padding: 6px;
+  border-radius: 12px;
+  background-color: var(--safari-popover-bg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18), 0 0 0 0.5px var(--safari-tile-border);
+  backdrop-filter: blur(30px) saturate(180%);
+  transform-origin: bottom right;
+  animation: safari-popover-in 0.18s ease;
+}
+.safari-startpage .safari-customize__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-family: var(--safari-font);
+  font-size: 13px;
+  color: var(--safari-label);
+  text-align: start;
+  cursor: pointer;
+}
+.safari-startpage .safari-customize__row:hover {
+  background-color: var(--safari-hover-bg);
+}
+.safari-startpage .safari-customize__check {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  color: var(--safari-accent);
+}
+.safari-startpage .safari-customize__label {
+  flex: 1 1 auto;
+}
+@media (prefers-color-scheme: dark) {
+  .safari-startpage {
+    --safari-bg: #1c1c1e;
+    --safari-tile-bg: #2c2c2e;
+    --safari-tile-border: rgba(255, 255, 255, 0.08);
+    --safari-tile-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --safari-label: #f5f5f7;
+    --safari-secondary-label: rgba(235, 235, 245, 0.6);
+    --safari-section-title: #f5f5f7;
+    --safari-hover-bg: rgba(255, 255, 255, 0.08);
+    --safari-card-bg: #2c2c2e;
+    --safari-accent: #0a84ff;
+    --safari-popover-bg: rgba(44, 44, 46, 0.82);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .safari-startpage .safari-tile,
+.safari-startpage .safari-tile__icon,
+.safari-startpage .safari-privacy-card,
+.safari-startpage .safari-customize__button,
+.safari-startpage .safari-customize__popover {
+    transition: none;
+    animation: none;
+  }
+}
+
+@keyframes safari-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 /* DO NOT EDIT this file directly, instead modify the relevant *.nova.tokens.json file
