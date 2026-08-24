@@ -3,44 +3,18 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from "react";
-
-function hostnameFor(url) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch (e) {
-    return url || "";
-  }
-}
+import {
+  colorForKey,
+  hostnameFor,
+} from "content-src/components/Safari/helpers";
 
 function labelFor(link) {
   return link.label || link.title || link.hostname || hostnameFor(link.url);
 }
 
-// Apple-style palette for iconless sites; all read well with white text.
-const LETTER_PALETTE = [
-  "#ff3b30",
-  "#ff9500",
-  "#ff2d55",
-  "#af52de",
-  "#5856d6",
-  "#007aff",
-  "#30b0c7",
-  "#34c759",
-  "#8e8e93",
-];
-
-function colorForKey(key) {
-  let hash = 0;
-  for (let i = 0; i < key.length; i++) {
-    hash = (hash << 5) - hash + key.charCodeAt(i);
-    hash |= 0;
-  }
-  return LETTER_PALETTE[Math.abs(hash) % LETTER_PALETTE.length];
-}
-
 // Decide how to paint the icon square from the real Top Sites `link` fields.
-// Safari renders the site icon (or a letter fallback) centered on an elevated
-// rounded square, so we never use full-bleed screenshots here.
+// Safari renders the site icon (or a letter fallback) on an elevated rounded
+// square, so we never use full-bleed screenshots here.
 function resolveIcon(link) {
   const iconUrl = link.tippyTopIcon || link.favicon || link.iconUri || null;
   if (link.searchTopSite && link.tippyTopIcon) {
@@ -78,7 +52,7 @@ export function SafariTile({ link, onOpen }) {
       <span className="safari-tile__icon">
         {icon.kind === "image" ? (
           <span
-            className="safari-tile__img"
+            className={`safari-tile__img${icon.backgroundColor ? " has-bg" : ""}`}
             style={{
               backgroundImage: `url("${icon.url}")`,
               ...(icon.backgroundColor

@@ -27,8 +27,26 @@ function CheckRow({ label, checked, onToggle }) {
 
 // Each toggle is bound to a real, persisted preference through `onSetPref`, so
 // the popover controls actual browser state rather than decorative switches.
-export function SafariCustomizePopover({ sections, onSetPref }) {
-  const [open, setOpen] = useState(false);
+// `open`/`onOpenChange` can be supplied to control it externally (e.g. from the
+// Start Page card's button); otherwise it manages its own open state.
+export function SafariCustomizePopover({
+  sections,
+  onSetPref,
+  open: controlledOpen,
+  onOpenChange,
+}) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+  const setOpen = next => {
+    const value = typeof next === "function" ? next(open) : next;
+    if (!isControlled) {
+      setUncontrolledOpen(value);
+    }
+    if (onOpenChange) {
+      onOpenChange(value);
+    }
+  };
   const wrapperRef = useRef(null);
 
   useEffect(() => {

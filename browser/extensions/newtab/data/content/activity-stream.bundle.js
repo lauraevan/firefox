@@ -26487,26 +26487,14 @@ function SafariSection({
     className: "safari-section__title"
   }, title) : null, children);
 }
-;// CONCATENATED MODULE: ./content-src/components/Safari/SafariTile.jsx
+;// CONCATENATED MODULE: ./content-src/components/Safari/helpers.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
-function hostnameFor(url) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch (e) {
-    return url || "";
-  }
-}
-function labelFor(link) {
-  return link.label || link.title || link.hostname || hostnameFor(link.url);
-}
-
 // Apple-style palette for iconless sites; all read well with white text.
 const LETTER_PALETTE = ["#ff3b30", "#ff9500", "#ff2d55", "#af52de", "#5856d6", "#007aff", "#30b0c7", "#34c759", "#8e8e93"];
-function colorForKey(key) {
+function colorForKey(key = "") {
   let hash = 0;
   for (let i = 0; i < key.length; i++) {
     hash = (hash << 5) - hash + key.charCodeAt(i);
@@ -26514,10 +26502,27 @@ function colorForKey(key) {
   }
   return LETTER_PALETTE[Math.abs(hash) % LETTER_PALETTE.length];
 }
+function hostnameFor(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch (e) {
+    return url || "";
+  }
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariTile.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+function labelFor(link) {
+  return link.label || link.title || link.hostname || hostnameFor(link.url);
+}
 
 // Decide how to paint the icon square from the real Top Sites `link` fields.
-// Safari renders the site icon (or a letter fallback) centered on an elevated
-// rounded square, so we never use full-bleed screenshots here.
+// Safari renders the site icon (or a letter fallback) on an elevated rounded
+// square, so we never use full-bleed screenshots here.
 function resolveIcon(link) {
   const iconUrl = link.tippyTopIcon || link.favicon || link.iconUri || null;
   if (link.searchTopSite && link.tippyTopIcon) {
@@ -26559,7 +26564,7 @@ function SafariTile({
   }, /*#__PURE__*/external_React_default().createElement("span", {
     className: "safari-tile__icon"
   }, icon.kind === "image" ? /*#__PURE__*/external_React_default().createElement("span", {
-    className: "safari-tile__img",
+    className: `safari-tile__img${icon.backgroundColor ? " has-bg" : ""}`,
     style: {
       backgroundImage: `url("${icon.url}")`,
       ...(icon.backgroundColor ? {
@@ -26729,11 +26734,26 @@ function CheckRow({
 
 // Each toggle is bound to a real, persisted preference through `onSetPref`, so
 // the popover controls actual browser state rather than decorative switches.
+// `open`/`onOpenChange` can be supplied to control it externally (e.g. from the
+// Start Page card's button); otherwise it manages its own open state.
 function SafariCustomizePopover({
   sections,
-  onSetPref
+  onSetPref,
+  open: controlledOpen,
+  onOpenChange
 }) {
-  const [open, setOpen] = (0,external_React_namespaceObject.useState)(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = (0,external_React_namespaceObject.useState)(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+  const setOpen = next => {
+    const value = typeof next === "function" ? next(open) : next;
+    if (!isControlled) {
+      setUncontrolledOpen(value);
+    }
+    if (onOpenChange) {
+      onOpenChange(value);
+    }
+  };
   const wrapperRef = (0,external_React_namespaceObject.useRef)(null);
   (0,external_React_namespaceObject.useEffect)(() => {
     if (!open) {
@@ -26775,6 +26795,231 @@ function SafariCustomizePopover({
     onClick: () => setOpen(v => !v)
   }, /*#__PURE__*/external_React_default().createElement(AdjustmentsIcon, null)));
 }
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariStartPageCard.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+// Original illustration approximating Safari's Start Page onboarding artwork:
+// two stacked "new tab" cards over a wallpaper, showing mock Favorites and
+// Suggestions rows.
+function StartPageIllustration() {
+  return /*#__PURE__*/external_React_default().createElement("svg", {
+    className: "safari-startcard__art",
+    viewBox: "0 0 200 156",
+    width: "200",
+    height: "156",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/external_React_default().createElement("defs", null, /*#__PURE__*/external_React_default().createElement("linearGradient", {
+    id: "safari-wp",
+    x1: "0",
+    y1: "0",
+    x2: "1",
+    y2: "1"
+  }, /*#__PURE__*/external_React_default().createElement("stop", {
+    offset: "0",
+    stopColor: "#f6c9a4"
+  }), /*#__PURE__*/external_React_default().createElement("stop", {
+    offset: "0.5",
+    stopColor: "#e59aa6"
+  }), /*#__PURE__*/external_React_default().createElement("stop", {
+    offset: "1",
+    stopColor: "#7ea6a0"
+  })), /*#__PURE__*/external_React_default().createElement("clipPath", {
+    id: "safari-card-clip"
+  }, /*#__PURE__*/external_React_default().createElement("rect", {
+    x: "34",
+    y: "18",
+    width: "150",
+    height: "120",
+    rx: "12"
+  }))), /*#__PURE__*/external_React_default().createElement("g", {
+    transform: "rotate(-6 60 70)"
+  }, /*#__PURE__*/external_React_default().createElement("rect", {
+    x: "16",
+    y: "26",
+    width: "150",
+    height: "120",
+    rx: "12",
+    fill: "url(#safari-wp)",
+    opacity: "0.55"
+  })), /*#__PURE__*/external_React_default().createElement("g", {
+    clipPath: "url(#safari-card-clip)"
+  }, /*#__PURE__*/external_React_default().createElement("rect", {
+    x: "34",
+    y: "18",
+    width: "150",
+    height: "120",
+    fill: "url(#safari-wp)"
+  }), /*#__PURE__*/external_React_default().createElement("path", {
+    d: "M34 118 L74 88 L104 112 L134 82 L184 122 L184 138 L34 138 Z",
+    fill: "rgba(60,70,90,0.35)"
+  }), /*#__PURE__*/external_React_default().createElement("text", {
+    x: "46",
+    y: "44",
+    fill: "#fff",
+    fontSize: "9",
+    fontWeight: "600"
+  }, "Favorites"), [0, 1, 2, 3, 4, 5, 6].map(i => /*#__PURE__*/external_React_default().createElement("rect", {
+    key: `f${i}`,
+    x: 46 + i * 18,
+    y: 50,
+    width: "13",
+    height: "13",
+    rx: "3.5",
+    fill: "rgba(255,255,255,0.9)"
+  })), /*#__PURE__*/external_React_default().createElement("text", {
+    x: "46",
+    y: "86",
+    fill: "#fff",
+    fontSize: "9",
+    fontWeight: "600"
+  }, "Suggestions"), [0, 1, 2, 3].map(i => /*#__PURE__*/external_React_default().createElement("rect", {
+    key: `s${i}`,
+    x: 46 + i * 32,
+    y: 92,
+    width: "27",
+    height: "20",
+    rx: "4",
+    fill: "rgba(255,255,255,0.55)"
+  }))), /*#__PURE__*/external_React_default().createElement("rect", {
+    x: "34",
+    y: "18",
+    width: "150",
+    height: "120",
+    rx: "12",
+    fill: "none",
+    stroke: "rgba(0,0,0,0.12)"
+  }));
+}
+
+// The intro / customize card at the top of the Start Page. Dismissible (state
+// is persisted through onDismiss -> a real pref) and its button opens the same
+// customize controls as the floating button.
+function SafariStartPageCard({
+  onCustomize,
+  onDismiss
+}) {
+  return /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-startcard"
+  }, /*#__PURE__*/external_React_default().createElement("button", {
+    type: "button",
+    className: "safari-startcard__close",
+    "aria-label": "Hide Start Page card",
+    onClick: onDismiss
+  }, /*#__PURE__*/external_React_default().createElement("svg", {
+    viewBox: "0 0 16 16",
+    width: "14",
+    height: "14",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/external_React_default().createElement("path", {
+    d: "M4 4l8 8M12 4l-8 8",
+    stroke: "currentColor",
+    strokeWidth: "1.6",
+    strokeLinecap: "round"
+  }))), /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-startcard__inner"
+  }, /*#__PURE__*/external_React_default().createElement(StartPageIllustration, null), /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-startcard__body"
+  }, /*#__PURE__*/external_React_default().createElement("h2", {
+    className: "safari-startcard__title"
+  }, "Start Page"), /*#__PURE__*/external_React_default().createElement("p", {
+    className: "safari-startcard__desc"
+  }, "Customize your wallpaper and sections that appear when creating new tabs."), /*#__PURE__*/external_React_default().createElement("button", {
+    type: "button",
+    className: "safari-startcard__button",
+    onClick: onCustomize
+  }, "Customize Start Page"))));
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariSyncCard.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+// Cross-device onboarding card shown in the Recently Viewed section when there
+// are no recent cross-device items yet. "Turn On" opens the real Firefox
+// account / sync setup (the genuine equivalent of the iCloud feature); "Not
+// Now" persists a dismissal through onDismiss.
+function SafariSyncCard({
+  onDismiss
+}) {
+  return /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-synccard"
+  }, /*#__PURE__*/external_React_default().createElement("h3", {
+    className: "safari-synccard__title"
+  }, "Include topics from other devices"), /*#__PURE__*/external_React_default().createElement("p", {
+    className: "safari-synccard__desc"
+  }, "Safari can include topics on your other devices signed into this iCloud account.", " ", /*#__PURE__*/external_React_default().createElement("a", {
+    className: "safari-link",
+    href: "https://support.mozilla.org/products/firefox/sync"
+  }, "About Safari & Privacy...")), /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-synccard__actions"
+  }, /*#__PURE__*/external_React_default().createElement("button", {
+    type: "button",
+    className: "safari-btn safari-btn--neutral",
+    onClick: onDismiss
+  }, "Not Now"), /*#__PURE__*/external_React_default().createElement("a", {
+    className: "safari-btn safari-btn--primary",
+    href: "about:preferences#sync"
+  }, "Turn On")));
+}
+;// CONCATENATED MODULE: ./content-src/components/Safari/SafariSuggestionCard.jsx
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+
+// One "Suggestions" card, built from a real Highlights row (recent history /
+// bookmark). Uses the page preview image when available, otherwise a derived
+// color plus the site favicon/letter. Text is overlaid at the bottom the way
+// Safari renders these cards.
+function SafariSuggestionCard({
+  item
+}) {
+  const host = item.hostname || hostnameFor(item.url);
+  const title = item.title || host;
+  const image = item.image || item.preview_image_url || null;
+  const favicon = item.tippyTopIcon || item.favicon || null;
+  const bg = item.backgroundColor || colorForKey(host);
+  const letter = (title || "?").trim().charAt(0).toUpperCase() || "?";
+  return /*#__PURE__*/external_React_default().createElement("a", {
+    className: "safari-suggestion",
+    href: item.url,
+    title: title,
+    draggable: "false"
+  }, /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__thumb",
+    style: image ? {
+      backgroundImage: `url("${image}")`
+    } : {
+      backgroundColor: bg
+    }
+  }, !image ? favicon ? /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__favicon",
+    style: {
+      backgroundImage: `url("${favicon}")`
+    }
+  }) : /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__letter",
+    "aria-hidden": "true"
+  }, letter) : null, /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__scrim"
+  }), /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__meta"
+  }, /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__title"
+  }, title), /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__host"
+  }, host), item.relativeTime ? /*#__PURE__*/external_React_default().createElement("span", {
+    className: "safari-suggestion__time"
+  }, item.relativeTime) : null)));
+}
 ;// CONCATENATED MODULE: ./content-src/components/Safari/SafariStartPageInner.jsx
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -26785,7 +27030,10 @@ function SafariCustomizePopover({
 
 
 
-function Grid({
+
+
+
+function TileGrid({
   links,
   onOpen
 }) {
@@ -26797,6 +27045,16 @@ function Grid({
     onOpen: onOpen
   })));
 }
+function SuggestionGrid({
+  items
+}) {
+  return /*#__PURE__*/external_React_default().createElement("div", {
+    className: "safari-suggestions"
+  }, items.map((item, i) => /*#__PURE__*/external_React_default().createElement(SafariSuggestionCard, {
+    key: item.guid || item.url || i,
+    item: item
+  })));
+}
 
 // Presentational start page. Deliberately free of Redux so it can be rendered
 // directly from a preview/test harness with representative data. All browser
@@ -26805,19 +27063,35 @@ function SafariStartPageInner(props) {
   const {
     favorites = [],
     frequentlyVisited = [],
+    suggestions = [],
+    recentlyViewed = [],
     showFavorites = true,
-    showFrequentlyVisited = true,
-    showPrivacyReport = true,
+    showRecentlyViewed = true,
+    showSuggestions = true,
+    showFrequentlyVisited = false,
+    showPrivacyReport = false,
     privacyReport = null,
     wallpaper = null,
+    startPageCardDismissed = false,
+    syncCardDismissed = false,
     onOpenLink,
     onSetPref = () => {}
   } = props;
+  const [customizeOpen, setCustomizeOpen] = (0,external_React_namespaceObject.useState)(false);
   const hasPrivacy = showPrivacyReport && privacyReport && typeof privacyReport.trackersBlocked === "number";
+  const showRecentlyViewedSection = showRecentlyViewed && (recentlyViewed.length > 0 || !syncCardDismissed);
   const customizeSections = [{
     label: "Favorites",
     pref: "safari.showFavorites",
     value: showFavorites
+  }, {
+    label: "Recently Viewed",
+    pref: "safari.showRecentlyViewed",
+    value: showRecentlyViewed
+  }, {
+    label: "Suggestions",
+    pref: "safari.showSuggestions",
+    value: showSuggestions
   }, {
     label: "Frequently Visited",
     pref: "safari.showFrequentlyVisited",
@@ -26838,14 +27112,27 @@ function SafariStartPageInner(props) {
     className: "safari-startpage__scroll"
   }, /*#__PURE__*/external_React_default().createElement("div", {
     className: "safari-startpage__content"
-  }, showFavorites && favorites.length > 0 ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
+  }, !startPageCardDismissed ? /*#__PURE__*/external_React_default().createElement(SafariStartPageCard, {
+    onCustomize: () => setCustomizeOpen(true),
+    onDismiss: () => onSetPref("safari.startPageCardDismissed", true)
+  }) : null, showFavorites && favorites.length > 0 ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
     title: "Favorites"
-  }, /*#__PURE__*/external_React_default().createElement(Grid, {
+  }, /*#__PURE__*/external_React_default().createElement(TileGrid, {
     links: favorites,
     onOpen: onOpenLink
+  })) : null, showRecentlyViewedSection ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
+    title: "Recently Viewed"
+  }, recentlyViewed.length > 0 ? /*#__PURE__*/external_React_default().createElement(SuggestionGrid, {
+    items: recentlyViewed
+  }) : /*#__PURE__*/external_React_default().createElement(SafariSyncCard, {
+    onDismiss: () => onSetPref("safari.syncCardDismissed", true)
+  })) : null, showSuggestions && suggestions.length > 0 ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
+    title: "Suggestions"
+  }, /*#__PURE__*/external_React_default().createElement(SuggestionGrid, {
+    items: suggestions
   })) : null, showFrequentlyVisited && frequentlyVisited.length > 0 ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
     title: "Frequently Visited"
-  }, /*#__PURE__*/external_React_default().createElement(Grid, {
+  }, /*#__PURE__*/external_React_default().createElement(TileGrid, {
     links: frequentlyVisited,
     onOpen: onOpenLink
   })) : null, hasPrivacy ? /*#__PURE__*/external_React_default().createElement(SafariSection, {
@@ -26854,7 +27141,9 @@ function SafariStartPageInner(props) {
     report: privacyReport
   })) : null)), /*#__PURE__*/external_React_default().createElement(SafariCustomizePopover, {
     sections: customizeSections,
-    onSetPref: onSetPref
+    onSetPref: onSetPref,
+    open: customizeOpen,
+    onOpenChange: setCustomizeOpen
   }));
 }
 ;// CONCATENATED MODULE: ./content-src/components/Safari/SafariStartPage.jsx
@@ -26886,6 +27175,17 @@ function partitionTopSites(rows = []) {
   };
 }
 
+// Real "Suggestions" come from the Highlights feed (recent history / bookmarks
+// with page preview images). Returns [] when highlights aren't available so the
+// section simply hides rather than showing placeholders.
+function suggestionsFromSections(sections = []) {
+  const highlights = sections.find(section => section.id === "highlights");
+  if (!highlights?.rows?.length) {
+    return [];
+  }
+  return highlights.rows.filter(row => row && row.url).slice(0, 12);
+}
+
 // Real tracker-blocking data reuses the existing PrivacyFeed / PrivacyWidget
 // pipeline (PrivacyMetricsService), so the count is genuine and never faked.
 function privacyReportFrom(state) {
@@ -26908,10 +27208,18 @@ function mapStateToProps(state) {
   return {
     favorites,
     frequentlyVisited,
+    suggestions: suggestionsFromSections(state.Sections),
+    // Recently Viewed currently surfaces the cross-device onboarding card; real
+    // recent items can populate this array in a later pass.
+    recentlyViewed: [],
     showFavorites: prefs["safari.showFavorites"] !== false,
-    showFrequentlyVisited: prefs["safari.showFrequentlyVisited"] !== false,
+    showRecentlyViewed: prefs["safari.showRecentlyViewed"] !== false,
+    showSuggestions: prefs["safari.showSuggestions"] !== false,
+    showFrequentlyVisited: prefs["safari.showFrequentlyVisited"] === true,
     showPrivacyReport,
-    privacyReport: showPrivacyReport ? privacyReportFrom(state) : null
+    privacyReport: showPrivacyReport ? privacyReportFrom(state) : null,
+    startPageCardDismissed: prefs["safari.startPageCardDismissed"] === true,
+    syncCardDismissed: prefs["safari.syncCardDismissed"] === true
   };
 }
 function mapDispatchToProps(dispatch) {

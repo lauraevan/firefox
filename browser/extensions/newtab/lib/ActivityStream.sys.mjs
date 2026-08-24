@@ -353,17 +353,45 @@ export const PREFS_CONFIG = new Map([
     },
   ],
   [
+    "safari.showRecentlyViewed",
+    {
+      title: "Safari Start Page: show the Recently Viewed section",
+      value: true,
+    },
+  ],
+  [
+    "safari.showSuggestions",
+    {
+      title: "Safari Start Page: show the Suggestions section",
+      value: true,
+    },
+  ],
+  [
     "safari.showFrequentlyVisited",
     {
       title: "Safari Start Page: show the Frequently Visited section",
-      value: true,
+      value: false,
     },
   ],
   [
     "safari.showPrivacyReport",
     {
       title: "Safari Start Page: show the Privacy Report card",
-      value: true,
+      value: false,
+    },
+  ],
+  [
+    "safari.startPageCardDismissed",
+    {
+      title: "Safari Start Page: the intro/customize card has been dismissed",
+      value: false,
+    },
+  ],
+  [
+    "safari.syncCardDismissed",
+    {
+      title: "Safari Start Page: the cross-device (Recently Viewed) card was dismissed",
+      value: false,
     },
   ],
   [

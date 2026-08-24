@@ -20,6 +20,17 @@ export function partitionTopSites(rows = []) {
   return { favorites: unpinned, frequentlyVisited: [] };
 }
 
+// Real "Suggestions" come from the Highlights feed (recent history / bookmarks
+// with page preview images). Returns [] when highlights aren't available so the
+// section simply hides rather than showing placeholders.
+export function suggestionsFromSections(sections = []) {
+  const highlights = sections.find(section => section.id === "highlights");
+  if (!highlights?.rows?.length) {
+    return [];
+  }
+  return highlights.rows.filter(row => row && row.url).slice(0, 12);
+}
+
 // Real tracker-blocking data reuses the existing PrivacyFeed / PrivacyWidget
 // pipeline (PrivacyMetricsService), so the count is genuine and never faked.
 function privacyReportFrom(state) {
@@ -42,10 +53,18 @@ function mapStateToProps(state) {
   return {
     favorites,
     frequentlyVisited,
+    suggestions: suggestionsFromSections(state.Sections),
+    // Recently Viewed currently surfaces the cross-device onboarding card; real
+    // recent items can populate this array in a later pass.
+    recentlyViewed: [],
     showFavorites: prefs["safari.showFavorites"] !== false,
-    showFrequentlyVisited: prefs["safari.showFrequentlyVisited"] !== false,
+    showRecentlyViewed: prefs["safari.showRecentlyViewed"] !== false,
+    showSuggestions: prefs["safari.showSuggestions"] !== false,
+    showFrequentlyVisited: prefs["safari.showFrequentlyVisited"] === true,
     showPrivacyReport,
     privacyReport: showPrivacyReport ? privacyReportFrom(state) : null,
+    startPageCardDismissed: prefs["safari.startPageCardDismissed"] === true,
+    syncCardDismissed: prefs["safari.syncCardDismissed"] === true,
   };
 }
 

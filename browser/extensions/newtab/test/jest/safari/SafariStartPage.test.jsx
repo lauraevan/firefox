@@ -4,7 +4,10 @@
 
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { partitionTopSites } from "content-src/components/Safari/SafariStartPage";
+import {
+  partitionTopSites,
+  suggestionsFromSections,
+} from "content-src/components/Safari/SafariStartPage";
 import { SafariStartPageInner } from "content-src/components/Safari/SafariStartPageInner";
 import { SafariTile } from "content-src/components/Safari/SafariTile";
 
@@ -49,6 +52,25 @@ describe("partitionTopSites", () => {
   });
 });
 
+describe("suggestionsFromSections", () => {
+  it("returns highlights rows with a url", () => {
+    const sections = [
+      { id: "topsites", rows: [{ url: "https://x.com" }] },
+      {
+        id: "highlights",
+        rows: [{ url: "https://a.com" }, { title: "no url" }, null],
+      },
+    ];
+    const result = suggestionsFromSections(sections);
+    expect(result.map(r => r.url)).toEqual(["https://a.com"]);
+  });
+
+  it("returns [] when there are no highlights", () => {
+    expect(suggestionsFromSections([])).toEqual([]);
+    expect(suggestionsFromSections()).toEqual([]);
+  });
+});
+
 describe("SafariTile", () => {
   it("renders the label and a colored letter fallback without a favicon", () => {
     const { container } = render(
@@ -83,20 +105,29 @@ describe("SafariStartPageInner", () => {
 
   it("shows the Favorites section when data is present", () => {
     render(
-      <SafariStartPageInner favorites={favorites} frequentlyVisited={[]} />
+      <SafariStartPageInner
+        favorites={favorites}
+        frequentlyVisited={[]}
+        startPageCardDismissed={true}
+      />
     );
     expect(screen.getByText("Favorites")).toBeInTheDocument();
   });
 
-  it("hides the Privacy Report unless a real number is present", () => {
+  it("hides the Privacy Report unless enabled with a real number", () => {
     const { rerender } = render(
-      <SafariStartPageInner favorites={favorites} privacyReport={null} />
+      <SafariStartPageInner
+        favorites={favorites}
+        showPrivacyReport={true}
+        privacyReport={null}
+      />
     );
     expect(screen.queryByText("Privacy Report")).not.toBeInTheDocument();
 
     rerender(
       <SafariStartPageInner
         favorites={favorites}
+        showPrivacyReport={true}
         privacyReport={{ trackersBlocked: 5 }}
       />
     );

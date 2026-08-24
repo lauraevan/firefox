@@ -16536,11 +16536,16 @@ hr {
   --safari-section-title: #1d1d1f;
   --safari-hover-bg: rgba(0, 0, 0, 0.05);
   --safari-card-bg: #ffffff;
+  --safari-elevated-bg: #ffffff;
+  --safari-neutral-btn: rgba(120, 120, 128, 0.16);
+  --safari-neutral-btn-hover: rgba(120, 120, 128, 0.24);
   --safari-accent: #007aff;
+  --safari-accent-hover: #0a6fe0;
   --safari-popover-bg: rgba(255, 255, 255, 0.82);
-  --safari-tile-size: 84px;
-  --safari-icon-size: 64px;
-  --safari-icon-radius: 16px;
+  --safari-tile-size: 90px;
+  --safari-icon-size: 74px;
+  --safari-icon-radius: 18px;
+  --safari-content-max: 1600px;
   position: relative;
   z-index: 0;
   min-height: 100vh;
@@ -16577,9 +16582,9 @@ hr {
   z-index: 1;
 }
 .safari-startpage__content {
-  max-width: 900px;
+  max-width: var(--safari-content-max);
   margin: 0 auto;
-  padding: 56px 32px 112px;
+  padding: 40px 40px 120px;
 }
 .safari-startpage .safari-section {
   margin-block-end: 44px;
@@ -16589,10 +16594,10 @@ hr {
 }
 .safari-startpage .safari-section__title {
   margin: 0 0 18px;
-  padding-inline: 6px;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
+  padding-inline: 2px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--safari-section-title);
 }
 .safari-startpage .safari-grid {
@@ -16625,7 +16630,7 @@ hr {
   width: var(--safari-icon-size);
   height: var(--safari-icon-size);
   border-radius: var(--safari-icon-radius);
-  background-color: var(--safari-tile-bg);
+  background-color: #fff;
   border: 0.5px solid var(--safari-tile-border);
   box-shadow: var(--safari-tile-shadow);
   overflow: hidden;
@@ -16639,7 +16644,10 @@ hr {
   height: 100%;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 58%;
+  background-size: 66%;
+}
+.safari-startpage .safari-tile__img.has-bg {
+  background-size: cover;
 }
 .safari-startpage .safari-tile__letter {
   display: grid;
@@ -16774,7 +16782,7 @@ hr {
 }
 @media (prefers-color-scheme: dark) {
   .safari-startpage {
-    --safari-bg: #1c1c1e;
+    --safari-bg: #1e1e1e;
     --safari-tile-bg: #2c2c2e;
     --safari-tile-border: rgba(255, 255, 255, 0.08);
     --safari-tile-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -16783,7 +16791,11 @@ hr {
     --safari-section-title: #f5f5f7;
     --safari-hover-bg: rgba(255, 255, 255, 0.08);
     --safari-card-bg: #2c2c2e;
+    --safari-elevated-bg: #2c2c2e;
+    --safari-neutral-btn: rgba(120, 120, 128, 0.28);
+    --safari-neutral-btn-hover: rgba(120, 120, 128, 0.4);
     --safari-accent: #0a84ff;
+    --safari-accent-hover: #339dff;
     --safari-popover-bg: rgba(44, 44, 46, 0.82);
   }
 }
@@ -16792,10 +16804,230 @@ hr {
 .safari-startpage .safari-tile__icon,
 .safari-startpage .safari-privacy-card,
 .safari-startpage .safari-customize__button,
-.safari-startpage .safari-customize__popover {
+.safari-startpage .safari-customize__popover,
+.safari-startpage .safari-startcard__button,
+.safari-startpage .safari-suggestion,
+.safari-startpage .safari-btn {
     transition: none;
     animation: none;
   }
+}
+.safari-startpage .safari-startcard {
+  position: relative;
+  margin-block-end: 40px;
+  padding: 28px 32px;
+  border-radius: 14px;
+  background-color: var(--safari-elevated-bg);
+  border: 0.5px solid var(--safari-tile-border);
+  box-shadow: var(--safari-tile-shadow);
+}
+.safari-startpage .safari-startcard__close {
+  position: absolute;
+  inset-block-start: 16px;
+  inset-inline-end: 16px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--safari-neutral-btn);
+  color: var(--safari-label);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.safari-startpage .safari-startcard__close:hover {
+  background-color: var(--safari-neutral-btn-hover);
+}
+.safari-startpage .safari-startcard__inner {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+  justify-content: center;
+}
+.safari-startpage .safari-startcard__art {
+  flex: 0 0 auto;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.18));
+}
+.safari-startpage .safari-startcard__body {
+  max-width: 420px;
+}
+.safari-startpage .safari-startcard__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--safari-label);
+}
+.safari-startpage .safari-startcard__desc {
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--safari-secondary-label);
+}
+.safari-startpage .safari-startcard__button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 9px;
+  background-color: var(--safari-accent);
+  color: #fff;
+  font-family: var(--safari-font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.safari-startpage .safari-startcard__button:hover {
+  background-color: var(--safari-accent-hover);
+}
+.safari-startpage .safari-synccard {
+  padding: 28px 32px;
+  border-radius: 14px;
+  background-color: var(--safari-elevated-bg);
+  border: 0.5px solid var(--safari-tile-border);
+  box-shadow: var(--safari-tile-shadow);
+  text-align: center;
+}
+.safari-startpage .safari-synccard__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--safari-label);
+}
+.safari-startpage .safari-synccard__desc {
+  margin: 0 auto 18px;
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--safari-secondary-label);
+}
+.safari-startpage .safari-synccard__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.safari-startpage .safari-link {
+  color: var(--safari-accent);
+  text-decoration: none;
+}
+.safari-startpage .safari-link:hover {
+  text-decoration: underline;
+}
+.safari-startpage .safari-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 9px;
+  font-family: var(--safari-font);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.safari-startpage .safari-btn--neutral {
+  background-color: var(--safari-neutral-btn);
+  color: var(--safari-label);
+}
+.safari-startpage .safari-btn--neutral:hover {
+  background-color: var(--safari-neutral-btn-hover);
+}
+.safari-startpage .safari-btn--primary {
+  background-color: var(--safari-accent);
+  color: #fff;
+}
+.safari-startpage .safari-btn--primary:hover {
+  background-color: var(--safari-accent-hover);
+}
+.safari-startpage .safari-suggestions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
+}
+.safari-startpage .safari-suggestion {
+  display: block;
+  text-decoration: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--safari-tile-shadow);
+  border: 0.5px solid var(--safari-tile-border);
+  transition: transform 0.15s ease;
+}
+.safari-startpage .safari-suggestion:hover {
+  transform: translateY(-2px);
+}
+.safari-startpage .safari-suggestion__thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16/10;
+  background-size: cover;
+  background-position: center;
+}
+.safari-startpage .safari-suggestion__favicon {
+  position: absolute;
+  inset-block-start: 16px;
+  inset-inline-start: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.9);
+  background-size: 66%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.safari-startpage .safari-suggestion__letter {
+  position: absolute;
+  inset-block-start: 14px;
+  inset-inline-start: 16px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+}
+.safari-startpage .safari-suggestion__scrim {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 70%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.72));
+}
+.safari-startpage .safari-suggestion__meta {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 14px 12px;
+  color: #fff;
+}
+.safari-startpage .safari-suggestion__title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.safari-startpage .safari-suggestion__host {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.safari-startpage .safari-suggestion__time {
+  margin-block-start: 2px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 @keyframes safari-popover-in {
